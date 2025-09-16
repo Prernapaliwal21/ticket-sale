@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify , make_response
+from flask import Flask, render_template, request, jsonify, make_response
 import os
 import razorpay
 import random
@@ -18,7 +18,6 @@ import secrets
 from pymongo import MongoClient
 from weasyprint import HTML
 
-
 app = Flask(__name__)
 
 # Configuration
@@ -27,7 +26,7 @@ RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "your_key_secret_here")
 razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 
 # MongoDB connection
-mongo_client = MongoClient(os.getenv("MONGO_URL"),  tls=True, tlsAllowInvalidCertificates=False)  # update if needed
+mongo_client = MongoClient(os.getenv("MONGO_URL"), tls=True, tlsAllowInvalidCertificates=False)
 db = mongo_client["festival_booking"]
 logins_collection = db["logins"]
 tickets_collection = db["tickets"]
@@ -35,14 +34,12 @@ users_collection = db["users"]
 
 TICKET_PRICE_INR = 200
 MAX_TICKETS = 10
-
+GST_RATE = 2.36  # 2.36%
 
 admin_sessions = {}
 
-
 def generate_qr_token():
     return str(uuid.uuid4()) + "-" + str(int(time.time()))
-
 
 def create_qr_code(ticket_data):
     qr_data = {
@@ -52,12 +49,7 @@ def create_qr_code(ticket_data):
         "event": "Mona Squad Dandiya Festival 2025",
         "timestamp": str(int(time.time())),
     }
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_M,
-        box_size=10,
-        border=4,
-    )
+    qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_M, box_size=10, border=4)
     qr.add_data(json.dumps(qr_data))
     qr.make(fit=True)
 
@@ -67,23 +59,18 @@ def create_qr_code(ticket_data):
     buffer.seek(0)
     return base64.b64encode(buffer.getvalue()).decode()
 
-
 def generate_pdf_tickets(tickets_data):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4)
     styles = getSampleStyleSheet()
     story = []
 
-    title = Paragraph(
-        "<b>Mona Squad Dandiya Festival 2025 - Entry Tickets</b>", styles["Title"]
-    )
+    title = Paragraph("<b>Mona Squad Dandiya Festival 2025 - Entry Tickets</b>", styles["Title"])
     story.append(title)
     story.append(Spacer(1, 20))
 
     for i, ticket in enumerate(tickets_data, 1):
-        ticket_header = Paragraph(
-            f"<b>Ticket #{i} - ID: {ticket['ticket_id']}</b>", styles["Heading2"]
-        )
+        ticket_header = Paragraph(f"<b>Ticket #{i} - ID: {ticket['ticket_id']}</b>", styles["Heading2"])
         story.append(ticket_header)
         story.append(Spacer(1, 10))
 
@@ -113,7 +100,6 @@ def generate_pdf_tickets(tickets_data):
     buffer.seek(0)
     return buffer
 
-
 @app.route("/")
 def index():
     return render_template(
@@ -123,7 +109,6 @@ def index():
         max_tickets=MAX_TICKETS,
     )
 
-
 @app.route("/create-order", methods=["POST"])
 def create_order():
     data = request.get_json(force=True)
@@ -131,29 +116,36 @@ def create_order():
     phone = (data.get("phone") or "").strip()
     quantity = int(data.get("quantity") or 1)
 
-    total_amount = TICKET_PRICE_INR * quantity * 100
+    base_amount = TICKET_PRICE_INR * quantity
+    gst_amount = round(base_amount * (GST_RATE / 100), 2)
+    total_amount = round(base_amount + gst_amount, 2)
+    total_amount_paise = int(total_amount * 100)
+
     order_data = {
-        "amount": total_amount,
+        "amount": total_amount_paise,
         "currency": "INR",
         "receipt": f"MONA_{int(time.time())}_{random.randint(1000, 9999)}",
         "notes": {
             "name": name,
             "phone": phone,
             "quantity": str(quantity),
+            "base_amount": str(base_amount),
+            "gst_amount": str(gst_amount),
         },
     }
     order = razorpay_client.order.create(data=order_data)
 
-    return jsonify(
-        {
-            "order_id": order["id"],
-            "amount": order["amount"],
-            "currency": order["currency"],
-            "name": name,
-            "phone": phone,
-            "quantity": quantity,
-        }
-    )
+    return jsonify({
+        "order_id": order["id"],
+        "amount": order["amount"],
+        "currency": order["currency"],
+        "name": name,
+        "phone": phone,
+        "quantity": quantity,
+        "gst_amount": gst_amount,
+        "total_amount": total_amount,
+    })
+
 
 
 @app.route("/success")
@@ -164,23 +156,30 @@ def success():
     tickets = list(tickets_collection.find({"payment_id": payment_id}, {"_id": 0}))
     if not tickets:
         return "Invalid payment or tickets not found", 400
+    
 
-    total_amount = len(tickets) * TICKET_PRICE_INR
+    total_amount = (TICKET_PRICE_INR * len(tickets) * GST_RATE )/ 100 + (TICKET_PRICE_INR * len(tickets))
+    total_amount = round(total_amount, 2)
+    base_amount = TICKET_PRICE_INR * len(tickets)
+    gst_amount = round(total_amount - base_amount, 2)
 
+    print(total_amount, base_amount, gst_amount)
     return render_template(
         "success.html",
         tickets=tickets,
         payment_id=payment_id,
         order_id=order_id,
         quantity=len(tickets),
+        base_amount=base_amount,
         price=TICKET_PRICE_INR,
         total=total_amount,
+        gst_amount=gst_amount,
     )
+
 
 @app.route("/payment-loader")
 def payment_loader():
     return render_template("loader.html")
-
 
 @app.route("/verify-payment", methods=["POST"])
 def verify_payment():
@@ -197,9 +196,7 @@ def verify_payment():
 
     payment = razorpay_client.payment.fetch(razorpay_payment_id)
     if payment.get("status") != "captured":
-        # ❌ Payment not completed
         return jsonify({"success": False, "redirect_url": "/"})
-    
     
     if generated_signature != razorpay_signature:
         return jsonify({"success": False, "error": "Signature mismatch"}), 400
@@ -208,6 +205,9 @@ def verify_payment():
     quantity = int(order["notes"].get("quantity", "1"))
     name = order["notes"].get("name", "Guest")
     phone = order["notes"].get("phone", "N/A")
+
+    gst_per_ticket = round(TICKET_PRICE_INR * (GST_RATE / 100), 2)
+    price_per_ticket = round(TICKET_PRICE_INR + gst_per_ticket, 2)
 
     tickets = []
     for i in range(quantity):
@@ -219,7 +219,7 @@ def verify_payment():
             "qr_token": qr_token,
             "name": name,
             "phone": phone,
-            "price_per_ticket": TICKET_PRICE_INR,
+            "price_per_ticket": price_per_ticket,
             "payment_id": razorpay_payment_id,
             "order_id": razorpay_order_id,
             "created_at": datetime.now().isoformat(),
@@ -228,20 +228,14 @@ def verify_payment():
         ticket_data["qr_code"] = create_qr_code(ticket_data)
         tickets.append(ticket_data)
 
-    # ✅ Save tickets in MongoDB
     tickets_collection.insert_many(tickets)
-
-
-    redirect_url = (
-        f"/success?payment_id={razorpay_payment_id}&order_id={razorpay_order_id}"
-    )
-
     for t in tickets:
         if "_id" in t:
             t["_id"] = str(t["_id"])  # or just delete: del t["_id"]
 
-    return jsonify({"success": True, "tickets": tickets, "redirect_url": redirect_url})
+    redirect_url = f"/success?payment_id={razorpay_payment_id}&order_id={razorpay_order_id}"
 
+    return jsonify({"success": True, "tickets": tickets, "redirect_url": redirect_url})
 
 @app.route("/admin/validate-qr", methods=["POST"])
 def admin_validate_qr():
@@ -260,43 +254,34 @@ def admin_validate_qr():
     if "qr_token" not in decoded_qr:
         return jsonify({"valid": False, "message": "QR token missing"})
 
-    print(decoded_qr)  # For debugging
     ticket_found = tickets_collection.find_one({"qr_token": decoded_qr["qr_token"]}, {"_id": 0})
-    print(ticket_found)  # For debugging
     if not ticket_found:
         return jsonify({"valid": False, "message": "Invalid QR - Not Found"})
 
-
     if ticket_found.get("is_scanned"):
-        return jsonify(
-            {
-                "valid": False,
-                "message": "DUPLICATE - Already scanned",
-                "ticket_id": ticket_found["ticket_id"],
-                "holder_name": ticket_found["name"],
-            }
-        )
+        return jsonify({
+            "valid": False,
+            "message": "DUPLICATE - Already scanned",
+            "ticket_id": ticket_found["ticket_id"],
+            "holder_name": ticket_found["name"],
+        })
 
     tickets_collection.update_one(
         {"ticket_id": ticket_found["ticket_id"]},
         {"$set": {"is_scanned": True, "scanned_at": datetime.now().isoformat()}}
     )
 
-
-    return jsonify(
-        {
-            "valid": True,
-            "message": "ENTRY APPROVED",
-            "ticket_details": {
-                "ticket_id": ticket_found["ticket_id"],
-                "name": ticket_found["name"],
-                "phone": ticket_found["phone"],
-                "price_paid": f"Rs.{ticket_found['price_per_ticket']}",
-                "entry_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            },
-        }
-    )
-
+    return jsonify({
+        "valid": True,
+        "message": "ENTRY APPROVED",
+        "ticket_details": {
+            "ticket_id": ticket_found["ticket_id"],
+            "name": ticket_found["name"],
+            "phone": ticket_found["phone"],
+            "price_paid": f"Rs.{ticket_found['price_per_ticket']}",
+            "entry_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        },
+    })
 
 @app.route('/download-pdf/<payment_id>')
 def download_pdf(payment_id):
@@ -304,16 +289,13 @@ def download_pdf(payment_id):
     if not tickets:
         return "No tickets found", 404
 
-    # Render ticket-only template
     html_content = render_template("tickets_pdf.html", tickets=tickets)
-
     pdf = HTML(string=html_content, base_url=request.host_url).write_pdf()
 
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = f'attachment; filename=tickets_{payment_id}.pdf'
     return response
-    
 
 @app.route("/admin/login", methods=["POST"])
 def admin_login():
@@ -321,9 +303,7 @@ def admin_login():
     email = data.get("email", "").strip()
     password = data.get("password", "").strip()
 
-    user = users_collection.find_one(
-        {"email": email, "password": password, "role": "admin"}
-    )
+    user = users_collection.find_one({"email": email, "password": password, "role": "admin"})
 
     if user:
         token = secrets.token_hex(32)
@@ -340,41 +320,32 @@ def admin_login():
     else:
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
-
-
-
 @app.route("/admin/logins")
 def admin_logins():
     logs = list(logins_collection.find({}, {"_id": 0}))
     return jsonify(logs)
-
 
 @app.route("/admin/stats")
 def admin_stats():
     total_tickets = tickets_collection.count_documents({})
     tickets_scanned = tickets_collection.count_documents({"is_scanned": True})
     pending_entries = total_tickets - tickets_scanned
-    total_revenue = total_tickets * TICKET_PRICE_INR
+    total_revenue = sum(ticket.get("price_per_ticket", 0) for ticket in tickets_collection.find({}))
 
-    return jsonify(
-        {
-            "total_tickets_sold": total_tickets,
-            "tickets_scanned": tickets_scanned,
-            "pending_entries": pending_entries,
-            "total_revenue": total_revenue,
-        }
-    )
-
+    return jsonify({
+        "total_tickets_sold": total_tickets,
+        "tickets_scanned": tickets_scanned,
+        "pending_entries": pending_entries,
+        "total_revenue": round(total_revenue, 2),
+    })
 
 @app.route("/admin/scanner")
 def admin_scanner():
     return render_template("admin_scanner.html")
 
-
 @app.route("/scanner")
 def scanner():
     return render_template("scanner.html")
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
