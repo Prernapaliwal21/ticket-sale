@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Scanner - Mona Squad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold mb-2">Mona Squad Festival</h1>
+            <p class="text-gray-300">QR Code Scanner - Entry Validation</p>
+        </div>
+
+        <!-- Scanner Status -->
+        <div class="max-w-md mx-auto mb-6">
+            <div id="scanner-status" class="bg-blue-600 text-white p-4 rounded-lg text-center">
+                <p>Click "Start Scanner" to begin</p>
+            </div>
+        </div>
+
+        <!-- Camera Selection -->
+        <div class="max-w-md mx-auto mb-4">
+            <select id="camera-select" class="w-full bg-gray-700 text-white p-2 rounded-lg border border-gray-600">
+                <option value="">Loading cameras...</option>
+            </select>
+        </div>
+
+        <!-- Camera Controls -->
+        <div class="max-w-md mx-auto mb-6 text-center">
+            <button id="start-scanner" 
+                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg mr-4">
+                Start Scanner
+            </button>
+            <button id="stop-scanner" 
+                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg" 
+                    disabled>
+                Stop Scanner
+            </button>
+        </div>
+
+        <!-- QR Reader -->
+        <div class="max-w-md mx-auto mb-6">
+            <div id="qr-reader" class="border-4 border-gray-600 rounded-lg overflow-hidden bg-black min-h-[300px] flex items-center justify-center">
+                <p class="text-gray-500">Camera will appear here</p>
+            </div>
+        </div>
+
+        <!-- Debug Info -->
+        <div class="max-w-md mx-auto mb-6">
+            <div id="debug-info" class="bg-gray-800 p-3 rounded-lg text-xs">
+                <div><strong>Debug Info:</strong></div>
+                <div id="debug-text">Ready to scan</div>
+            </div>
+        </div>
+
+        <!-- Scan Results -->
+        <div id="scan-results" class="max-w-2xl mx-auto"></div>
+
+        <!-- Back Button -->
+        <div class="text-center mt-8">
+            <a href="/" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg">
+                Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let html5QrcodeScanner = null;
+        let cameras = [];
+        let selectedCameraId = null;
+
+        // Debug function
+        function debug(message) {
+            console.log(message);
+            const debugDiv = document.getElementById('debug-text');
+            debugDiv.innerHTML += '<br>' + new Date().toLocaleTimeString() + ': ' + message;
+        }
+
+        // Load available cameras
+        async function loadCameras() {
+            try {
+                // Request camera permissions first
+                await navigator.mediaDevices.getUserMedia({ video: true });
+                
+                cameras = await Html5Qrcode.getCameras();
+                const cameraSelect = document.getElementById('camera-select');
+                cameraSelect.innerHTML = '';
+                
+                if (cameras && cameras.length > 0) {
+                    cameras.forEach((camera, index) => {
+                        const option = document.createElement('option');
+                        option.value = camera.id;
+                        option.text = camera.label || `Camera ${index + 1}`;
+                        cameraSelect.appendChild(option);
+                    });
+                    selectedCameraId = cameras[cameras.length - 1].id; // Prefer back camera
+                    cameraSelect.value = selectedCameraId;
+                    debug(`Found ${cameras.length} cameras`);
+                } else {
+                    cameraSelect.innerHTML = '<option value="">No cameras found</option>';
+                    debug('No cameras detected');
+                }
+            } catch (error) {
+                debug('Camera permission error: ' + error.message);
+                const cameraSelect = document.getElementById('camera-select');
+                cameraSelect.innerHTML = '<option value="">Camera access denied</option>';
+            }
+        }
+
+        async function startScanner() {
+            try {
+                selectedCameraId = document.getElementById('camera-select').value;
+                
+                if (!selectedCameraId) {
+                    alert('No camera selected');
+                    return;
+                }
+
+                const config = {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 },
+                    aspectRatio: 1.0,
+                    disableFlip: false
+                };
+
+                html5QrcodeScanner = new Html5Qrcode("qr-reader");
+                
+                await html5QrcodeScanner.start(
+                    selectedCameraId,
+                    config,
+                    onScanSuccess,
+                    onScanFailure
+                );
+                
+                document.getElementById('start-scanner').disabled = true;
+                document.getElementById('stop-scanner').disabled = false;
+                document.getElementById('scanner-status').innerHTML = '<p class="text-green-400">Scanner Active - Point camera at QR code</p>';
+                debug('Scanner started successfully');
+                
+            } catch (error) {
+                debug('Start scanner error: ' + error.message);
+                document.getElementById('scanner-status').innerHTML = `<p class="text-red-400">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function stopScanner() {
+            try {
+                if (html5QrcodeScanner) {
+                    await html5QrcodeScanner.stop();
+                    html5QrcodeScanner = null;
+                }
+                
+                document.getElementById('start-scanner').disabled = false;
+                document.getElementById('stop-scanner').disabled = true;
+                document.getElementById('scanner-status').innerHTML = '<p>Scanner Stopped</p>';
+                debug('Scanner stopped');
+                
+            } catch (error) {
+                debug('Stop scanner error: ' + error.message);
+            }
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            debug('QR Code scanned: ' + decodedText.substring(0, 50) + '...');
+            displayScanResult(decodedText);
+            
+            // Optional: Stop scanner after successful scan
+            // stopScanner();
+        }
+
+        function onScanFailure(error) {
+            // Handle scan failure silently, but log for debugging
+            // debug('Scan attempt failed: ' + error);
+        }
+
+        function displayScanResult(qrData) {
+            const resultsDiv = document.getElementById('scan-results');
+            
+            try {
+                const ticketData = JSON.parse(qrData);
+                
+                const resultCard = document.createElement('div');
+                resultCard.className = 'bg-green-800 p-4 rounded-lg mb-4 animate-pulse';
+                
+                resultCard.innerHTML = `
+                    <div class="text-center mb-4">
+                        <div class="text-2xl mb-2">✅</div>
+                        <div class="font-bold text-lg text-green-300">Valid Ticket Scanned!</div>
+                    </div>
+                    <div class="bg-black/20 rounded p-3">
+                        <div class="grid grid-cols-1 gap-2 text-sm">
+                            <div><strong>Event:</strong> ${ticketData.event || 'Mona Squad Festival'}</div>
+                            <div><strong>Ticket ID:</strong> ${ticketData.ticket_id || 'N/A'}</div>
+                            <div><strong>Holder:</strong> ${ticketData.name || 'N/A'}</div>
+                            <div><strong>QR Token:</strong> ${ticketData.qr_token || 'N/A'}</div>
+                            <div><strong>Scanned At:</strong> ${new Date().toLocaleString()}</div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <div class="text-yellow-300 text-sm">
+                            ⚠️ This is a public scanner. For entry validation, please use the admin scanner.
+                        </div>
+                    </div>
+                `;
+                
+                resultsDiv.innerHTML = '';
+                resultsDiv.appendChild(resultCard);
+                
+                // Play success sound (if supported)
+                try {
+                    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMcBzqU2+/EbCEELIHO8tmJOQcZabjr5Z9NEAxPr+vemicIDWvA0+eWMHIDKYHM5K4DWcKvYxwHOU7RjdcjERh2yxuHISIFKILI8tCKNwgZY7nm1n0wCiHU/paqFmEJ6Ep0nVRADnSLvWBGWhHjAgEoQj5MQrNgNjVhstDdr2QaCjG4FeU9jbHQr2gRJILIr9ckJQoqiLjhS7qFaGZZnT5WY3IeGQYJ4w6CHXICGLGaxgEXZhkpxEDPCx4aJF1HpUIcCAkYiIL/JjoNGNjQ1mNUGiI0xg==');
+                    audio.volume = 0.3;
+                    audio.play();
+                } catch (e) {}
+                
+            } catch (error) {
+                const resultCard = document.createElement('div');
+                resultCard.className = 'bg-blue-800 p-4 rounded-lg mb-4';
+                
+                resultCard.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">📄</div>
+                        <div class="font-bold text-lg">Raw QR Code Data</div>
+                        <div class="bg-black/20 rounded p-3 mt-3">
+                            <div class="text-sm font-mono break-all">${qrData}</div>
+                        </div>
+                        <div class="text-sm text-gray-300 mt-2">
+                            Scanned at: ${new Date().toLocaleString()}
+                        </div>
+                    </div>
+                `;
+                
+                resultsDiv.innerHTML = '';
+                resultsDiv.appendChild(resultCard);
+            }
+            
+            // Auto-hide after 15 seconds
+            setTimeout(() => {
+                const cards = resultsDiv.querySelectorAll('.bg-green-800, .bg-blue-800');
+                if (cards.length > 0) {
+                    resultsDiv.innerHTML = '';
+                }
+            }, 15000);
+        }
+
+        // Event listeners
+        document.getElementById('start-scanner').addEventListener('click', startScanner);
+        document.getElementById('stop-scanner').addEventListener('click', stopScanner);
+        
+        document.getElementById('camera-select').addEventListener('change', function() {
+            selectedCameraId = this.value;
+            debug('Camera changed to: ' + this.options[this.selectedIndex].text);
+        });
+
+        // Initialize
+        window.addEventListener('load', () => {
+            debug('Page loaded, initializing...');
+            loadCameras();
+        });
+
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && html5QrcodeScanner) {
+                debug('Page hidden, stopping scanner');
+                stopScanner();
+            }
+        });
+    </script>
+</body>
+</html>

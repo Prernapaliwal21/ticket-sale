@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Tickets PDF</title>
+    <style>
+      body {
+        font-family: "Inter", Arial, sans-serif;
+        background: #f8fafc;
+        padding: 20px;
+      }
+
+      .ticket-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        background: linear-gradient(
+            rgba(255, 255, 255, 0.75),
+            rgba(255, 255, 255, 0.75)
+          ),
+          /* white overlay */ url("/static/images/ticket-bg.png") no-repeat
+            center center;
+        background-size: cover;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        color: #111827;
+      }
+
+      .ticket-details {
+        flex: 1;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .ticket-details b {
+        font-weight: 600;
+      }
+
+      .ticket-header {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .qr {
+        flex-shrink: 0;
+        margin-left: 20px;
+        text-align: center;
+      }
+
+      .qr img {
+        width: 150px;
+        height: 150px;
+      }
+
+      .instructions {
+        margin-top: 15px;
+        background: rgba(
+          255,
+          248,
+          225,
+          0.8
+        ); /* Slightly transparent so background shows */
+        border-left: 4px solid #fbbf24;
+        padding: 10px;
+        font-size: 13px;
+        color: #92400e;
+      }
+    </style>
+  </head>
+  <body>
+    {% for ticket in tickets %}
+    <div class="ticket-card">
+      <div class="ticket-details">
+        <div class="ticket-header">
+          Mona Squad Festival 2025 - Ticket #{{ loop.index }}
+        </div>
+        <p><b>Ticket ID:</b> {{ ticket.ticket_id }}</p>
+        <p><b>Holder Name:</b> {{ ticket.name }}</p>
+        <p><b>Phone:</b> {{ ticket.phone }}</p>
+        <p><b>Price:</b> Rs.{{ ticket.price_per_ticket }}</p>
+        <div class="instructions">
+          ⚠️ <b>Entry Instructions:</b><br />
+          • Present this QR code at venue entrance <br />
+          • Bring valid photo ID <br />
+          • Each ticket valid for single entry only <br />
+          • Screenshot or printed copy both accepted
+        </div>
+      </div>
+      <div class="qr">
+        <img src="data:image/png;base64,{{ ticket.qr_code }}" />
+        <div style="font-size: 12px; color: #6b7280; margin-top: 5px">
+          Scan at venue entrance
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </body>
+</html>

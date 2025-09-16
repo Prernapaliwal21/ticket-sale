@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin QR Scanner - Mona Squad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <style>
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateY(-100px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .slide-in {
+        animation: slideIn 0.5s ease-out;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold mb-2">Admin Control Panel</h1>
+        <p class="text-gray-300">
+          Mona Squad Festival - Entry Validation System
+        </p>
+      </div>
+
+      <div id="loginSection" class="max-w-md mx-auto mb-8">
+        <div class="bg-red-800 rounded-lg p-6">
+          <h2 class="text-xl font-bold mb-4 text-center">
+            Admin Authentication Required
+          </h2>
+          <div class="mb-4">
+            <input
+              type="email"
+              id="adminEmail"
+              placeholder="Enter Admin Email"
+              class="w-full p-3 border rounded-lg bg-gray-800 text-white border-gray-600 mb-3"
+              onkeypress="handlePasswordKeypress(event)"
+            />
+            <input
+              type="password"
+              id="adminPassword"
+              placeholder="Enter Admin Password"
+              class="w-full p-3 border rounded-lg bg-gray-800 text-white border-gray-600"
+              onkeypress="handlePasswordKeypress(event)"
+            />
+          </div>
+          <button
+            onclick="adminLogin()"
+            class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg"
+          >
+            Access Scanner
+          </button>
+          <div
+            id="loginError"
+            class="mt-3 text-red-300 text-center hidden"
+          ></div>
+        </div>
+      </div>
+
+      <div id="scannerSection" class="hidden">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div class="bg-blue-800 rounded-lg p-4 text-center">
+            <div class="text-2xl font-bold" id="totalTickets">0</div>
+            <div class="text-sm text-blue-200">Total Sold</div>
+          </div>
+          <div class="bg-green-800 rounded-lg p-4 text-center">
+            <div class="text-2xl font-bold" id="scannedTickets">0</div>
+            <div class="text-sm text-green-200">Entries Approved</div>
+          </div>
+          <div class="bg-yellow-800 rounded-lg p-4 text-center">
+            <div class="text-2xl font-bold" id="pendingTickets">0</div>
+            <div class="text-sm text-yellow-200">Pending Entries</div>
+          </div>
+          <div class="bg-purple-800 rounded-lg p-4 text-center">
+            <div class="text-2xl font-bold" id="totalRevenue">Rs.0</div>
+            <div class="text-sm text-purple-200">Total Revenue</div>
+          </div>
+        </div>
+
+        <div class="max-w-md mx-auto mb-6">
+          <div
+            id="scanner-status"
+            class="bg-blue-600 text-white p-4 rounded-lg text-center"
+          >
+            <p>Click "Start QR Scanner" to begin</p>
+          </div>
+        </div>
+
+        <div class="max-w-md mx-auto mb-6 text-center">
+          <button
+            id="start-scanner"
+            class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg mr-4"
+          >
+            Start QR Scanner
+          </button>
+
+          <button
+            id="stop-scanner"
+            class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg"
+            disabled
+          >
+            Stop Scanner
+          </button>
+        </div>
+
+        <div class="max-w-md mx-auto mb-6">
+          <div
+            id="qr-reader"
+            class="border-4 border-gray-600 rounded-lg overflow-hidden bg-black"
+          ></div>
+        </div>
+
+        <!-- <div id="validation-results" class="max-w-2xl mx-auto"></div>
+
+        <div class="max-w-2xl mx-auto mt-8">
+          <h3 class="text-xl font-bold mb-4">Recent Validations</h3>
+          <div id="recent-scans" class="space-y-3"></div>
+        </div> -->
+      </div>
+
+      <div class="text-center mt-8 text-gray-400">
+        <p>Mona Squad Festival 2025 - Admin Portal</p>
+        <button
+          onclick="refreshStats()"
+          class="mt-2 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded"
+        >
+          Refresh Stats
+        </button>
+      </div>
+    </div>
+    <div
+      id="scanPopup"
+      class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden"
+    >
+      <div class="bg-white text-black rounded-lg p-6 max-w-md text-center">
+        <h2 id="scanPopupTitle" class="text-2xl font-bold mb-4">Scan Result</h2>
+        <p id="scanPopupMessage" class="mb-4">Message goes here</p>
+        <button
+          onclick="closeScanPopup()"
+          class="bg-blue-600 text-white py-2 px-4 rounded"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+
+    <script>
+      let adminToken = null;
+      let html5QrcodeScanner = null;
+      let scannerPausedForPopup = false;
+      let recentlyScanned = new Set();
+      window.onload = loadAdminDashboard;
+
+      function showScanPopup(title, message, pauseScanner = false) {
+        document.getElementById("scanPopupTitle").innerText = title;
+        document.getElementById("scanPopupMessage").innerText = message;
+        document.getElementById("scanPopup").classList.remove("hidden");
+
+        // Pause scanner only if flag is true
+        if (pauseScanner && html5QrcodeScanner) {
+          html5QrcodeScanner.pause();
+          scannerPausedForPopup = true;
+        }
+      }
+
+      function closeScanPopup() {
+        document.getElementById("scanPopup").classList.add("hidden");
+
+        // Resume scanner only if we paused it
+        if (scannerPausedForPopup && html5QrcodeScanner) {
+          html5QrcodeScanner.resume();
+          scannerPausedForPopup = false;
+        }
+      }
+
+      function handlePasswordKeypress(event) {
+        if (event.key === "Enter") adminLogin();
+      }
+
+      async function adminLogin() {
+        const email = document.getElementById("adminEmail").value;
+        const password = document.getElementById("adminPassword").value;
+        const errorDiv = document.getElementById("loginError");
+
+        const response = await fetch("/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          localStorage.setItem("adminToken", data.token); // ✅ persists across reload
+          loadAdminDashboard();
+        } else {
+          errorDiv.textContent = data.message;
+          errorDiv.classList.remove("hidden");
+        }
+      }
+
+      function loadAdminDashboard() {
+        const token = localStorage.getItem("adminToken");
+        if (token) {
+          adminToken = token;
+          document.getElementById("loginSection").style.display = "none";
+          document.getElementById("scannerSection").classList.remove("hidden");
+          refreshStats();
+        }
+      }
+     
+
+      async function refreshStats() {
+        const response = await fetch("/admin/stats");
+        const stats = await response.json();
+
+        document.getElementById("totalTickets").textContent =
+          stats.total_tickets_sold;
+        document.getElementById("scannedTickets").textContent =
+          stats.tickets_scanned;
+        document.getElementById("pendingTickets").textContent =
+          stats.pending_entries;
+        document.getElementById("totalRevenue").textContent =
+          "Rs." + stats.total_revenue;
+      }
+
+      function startScanner() {
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+        html5QrcodeScanner = new Html5Qrcode("qr-reader");
+
+        html5QrcodeScanner.start(
+          { facingMode: "environment" }, // Rear camera
+          config,
+          onScanSuccess,
+          onScanFailure
+        );
+
+        document.getElementById("start-scanner").disabled = true;
+        document.getElementById("stop-scanner").disabled = false;
+        document.getElementById("scanner-status").innerHTML =
+          '<p class="text-green-400">Scanner Active - Point camera at QR Code</p>';
+      }
+
+      function stopScanner() {
+        if (html5QrcodeScanner) {
+          html5QrcodeScanner.clear();
+          html5QrcodeScanner = null;
+        }
+        document.getElementById("start-scanner").disabled = false;
+        document.getElementById("stop-scanner").disabled = true;
+        document.getElementById("scanner-status").innerHTML =
+          "<p>Scanner Stopped</p>";
+      }
+
+      async function onScanSuccess(decodedText) {
+        const qrData = decodedText.trim();
+
+        if (recentlyScanned.has(qrData)) return;
+
+        recentlyScanned.add(qrData);
+        setTimeout(() => recentlyScanned.delete(qrData), 5000);
+
+        console.log("QR scanned:", qrData);
+
+        const result = await validateQR(qrData);
+
+        showScanPopup(
+          result.valid ? "✅ Entry Approved" : "❌ Entry Denied",
+          result.message,
+          result.valid
+        );
+
+        if (result) {
+          addToRecentScans(result, qrData);
+          refreshStats();
+        }
+      }
+
+      function onScanFailure(error) {
+        // Silent failure, do not do anything
+        console.debug("Scan failed (ignored):", error);
+      }
+
+      async function validateQR(qrData) {
+        if (!adminToken) {
+          showScanPopup("⚠️ Unauthorized", "Admin authentication required");
+          return { valid: false, message: "Unauthorized" };
+        }
+
+        try {
+          const response = await fetch("/admin/validate-qr", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ qr_data: qrData, admin_token: adminToken }),
+          });
+
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+          const result = await response.json();
+          console.log("Validation result:", result);
+
+          return result;
+        } catch (err) {
+          console.error(
+            "Network or unexpected error during QR validation:",
+            err
+          );
+          return { valid: false, message: "System Error" };
+        }
+      }
+
+      function displayValidationResult(result, qrData) {
+        const resultsDiv = document.getElementById("validation-results");
+        const isValid = result.valid;
+
+        const resultCard = document.createElement("div");
+        resultCard.className = `p-4 rounded-lg mb-4 slide-in ${
+          isValid ? "bg-green-800" : "bg-red-800"
+        }`;
+
+        let content = `
+    <div class="flex items-center mb-2">
+      <div class="text-2xl mr-3">${isValid ? "✅" : "❌"}</div>
+      <div class="flex-1">
+        <div class="font-bold text-lg">${
+          isValid ? "ENTRY APPROVED" : "ENTRY DENIED"
+        }</div>
+        <div class="text-sm opacity-80">QR Data: ${qrData}</div>
+      </div>
+    </div>
+    <div class="text-sm mb-2">${result.message}</div>
+  `;
+
+        if (isValid && result.ticket_details) {
+          content += `
+      <div class="bg-black/20 rounded p-3 mt-3">
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div><strong>Name:</strong> ${result.ticket_details.name}</div>
+          <div><strong>Ticket ID:</strong> ${result.ticket_details.ticket_id}</div>
+          <div><strong>Email:</strong> ${result.ticket_details.email}</div>
+          <div><strong>Phone:</strong> ${result.ticket_details.phone}</div>
+          <div><strong>Price:</strong> ${result.ticket_details.price_paid}</div>
+          <div><strong>Entry Time:</strong> ${result.ticket_details.entry_time}</div>
+        </div>
+      </div>
+    `;
+        }
+
+        resultCard.innerHTML = content;
+        resultsDiv.innerHTML = "";
+        resultsDiv.appendChild(resultCard);
+
+        setTimeout(() => {
+          if (resultCard.parentNode) resultCard.remove();
+        }, 10000);
+      }
+
+      function addToRecentScans(result, qrData) {
+        const recentScansDiv = document.getElementById("recent-scans");
+        const timestamp = new Date().toLocaleString();
+
+        const scanItem = document.createElement("div");
+        scanItem.className = `p-3 rounded ${
+          result.valid ? "bg-green-900" : "bg-red-900"
+        } text-sm`;
+
+        scanItem.innerHTML = `
+          <div class="flex justify-between items-center">
+            <div><span class="font-bold">${
+              result.valid ? "APPROVED" : "DENIED"
+            }</span> - ${
+          result.ticket_details ? result.ticket_details.name : ""
+        }</div>
+            <div class="text-xs opacity-70">${timestamp}</div>
+          </div>
+          <div class="text-xs opacity-80 mt-1">QR Data: ${qrData}</div>
+        `;
+
+        recentScansDiv.insertBefore(scanItem, recentScansDiv.firstChild);
+
+        while (recentScansDiv.children.length > 10) {
+          recentScansDiv.removeChild(recentScansDiv.lastChild);
+        }
+      }
+
+      document
+        .getElementById("start-scanner")
+        .addEventListener("click", startScanner);
+      document
+        .getElementById("stop-scanner")
+        .addEventListener("click", stopScanner);
+
+      setInterval(refreshStats, 30000);
+    </script>
+  </body>
+</html>
