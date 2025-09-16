@@ -27,13 +27,13 @@ RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "your_key_secret_here")
 razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 
 # MongoDB connection
-mongo_client = MongoClient("mongodb://localhost:27017/")  # update if needed
+mongo_client = MongoClient(os.getenv("MONGO_URL"))  # update if needed
 db = mongo_client["festival_booking"]
 logins_collection = db["logins"]
 tickets_collection = db["tickets"]
 users_collection = db["users"]
 
-TICKET_PRICE_INR = 100
+TICKET_PRICE_INR = 200
 MAX_TICKETS = 10
 
 
@@ -49,7 +49,7 @@ def create_qr_code(ticket_data):
         "ticket_id": ticket_data["ticket_id"],
         "qr_token": ticket_data["qr_token"],
         "name": ticket_data["name"],
-        "event": "Mona Squad Festival 2025",
+        "event": "Mona Squad Dandiya Festival 2025",
         "timestamp": str(int(time.time())),
     }
     qr = qrcode.QRCode(
@@ -75,7 +75,7 @@ def generate_pdf_tickets(tickets_data):
     story = []
 
     title = Paragraph(
-        "<b>Mona Squad Festival 2025 - Entry Tickets</b>", styles["Title"]
+        "<b>Mona Squad Dandiya Festival 2025 - Entry Tickets</b>", styles["Title"]
     )
     story.append(title)
     story.append(Spacer(1, 20))
@@ -88,7 +88,7 @@ def generate_pdf_tickets(tickets_data):
         story.append(Spacer(1, 10))
 
         details = f"""
-<b>Event:</b> Mona Squad Festival 2025<br/>
+<b>Event:</b> Mona Squad Dandiya Festival 2025<br/>
 <b>Name:</b> {ticket["name"]}<br/>
 <b>Phone:</b> {ticket["phone"]}<br/>
 <b>Price:</b> Rs.{ticket["price_per_ticket"]}<br/>

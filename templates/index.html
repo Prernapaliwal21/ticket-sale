@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mona Squad Festival</title>
+    <title>Mona Squad Dandiya Festival</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
@@ -62,13 +62,13 @@
 
       <!-- Content -->
       <h1 class="text-5xl md:text-6xl font-bold text-white drop-shadow-lg">
-        Mona Squad Festival
+        Mona Squad Dandiya Festival
       </h1>
       <p class="mt-4 text-xl text-white drop-shadow">
         Join us for music, dance & celebrations
       </p>
       <button
-        onclick="openBookingForm('Mona Squad Festival 2025')"
+        onclick="openBookingForm('Mona Squad Dandiya Festival 2025')"
         class="mt-8 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all transform hover:scale-105"
       >
         Book Tickets Now - Rs.{{ price }} per ticket
@@ -231,7 +231,7 @@
               key: "{{ razorpay_key_id }}",
               amount: orderData.amount,
               currency: orderData.currency,
-              name: "Mona Squad Festival",
+              name: "Mona Squad Dandiya Festival",
               description: "Festival Entry Pass",
               order_id: orderData.order_id,
               prefill: {
