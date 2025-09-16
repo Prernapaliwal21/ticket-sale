@@ -26,8 +26,10 @@ RUN pip install -r requirements.txt
 # Copy project files
 COPY . .
 
-# Expose port
-ENV PORT 5000
+# Set environment variable for Render
+ENV PORT=5000
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
 
 # Start the app
-CMD ["python", "app.py"]
+CMD ["flask", "run"]

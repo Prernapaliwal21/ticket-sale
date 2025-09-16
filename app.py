@@ -27,7 +27,7 @@ RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "your_key_secret_here")
 razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 
 # MongoDB connection
-mongo_client = MongoClient(os.getenv("MONGO_URL"), tlsAllowInvalidCertificates=True)  # update if needed
+mongo_client = MongoClient(os.getenv("MONGO_URL"),  tls=True, tlsAllowInvalidCertificates=False)  # update if needed
 db = mongo_client["festival_booking"]
 logins_collection = db["logins"]
 tickets_collection = db["tickets"]
