@@ -1,4 +1,4 @@
-# Use a Python version that works locally
+# Base image with Python 3.12
 FROM python:3.12.9-slim
 
 # Install system dependencies needed for Pillow
@@ -10,13 +10,13 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /app
 
-# Copy project files
+# Copy all project files
 COPY . .
 
-# Upgrade pip/build tools
+# Upgrade pip, setuptools, wheel
 RUN pip install --upgrade pip setuptools wheel
 
-# Install Python dependencies
+# Install dependencies from requirements.txt
 RUN pip install --prefer-binary -r requirements.txt
 
 # Command to run your app
