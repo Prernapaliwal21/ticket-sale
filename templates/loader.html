@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Verifying Payment...</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 100px; }
+    .spinner {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #4F46E5;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      margin: auto;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <h2>Please wait, verifying your payment...</h2>
+  <div class="spinner"></div>
+  <p>Do not refresh this page.</p>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+
+    fetch("/verify-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        razorpay_order_id: params.get("razorpay_order_id"),
+        razorpay_payment_id: params.get("razorpay_payment_id"),
+        razorpay_signature: params.get("razorpay_signature"),
+      }),
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        window.location.href = data.redirect_url;
+      } else {
+        alert("Payment verification failed: " + (data.error || "Unknown error"));
+        window.location.href = "/";
+      }
+    })
+    .catch(err => {
+      alert("Error verifying payment: " + err.message);
+      window.location.href = "/";
+    });
+  </script>
+</body>
+</html>

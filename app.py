@@ -177,6 +177,10 @@ def success():
         total=total_amount,
     )
 
+@app.route("/payment-loader")
+def payment_loader():
+    return render_template("loader.html")
+
 
 @app.route("/verify-payment", methods=["POST"])
 def verify_payment():

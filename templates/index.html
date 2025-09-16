@@ -239,29 +239,16 @@
                 contact: orderData.phone,
               },
               theme: { color: "#4F46E5" },
-              handler: async function (response) {
-                try {
-                  const verifyResponse = await fetch("/verify-payment", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      razorpay_order_id: response.razorpay_order_id,
-                      razorpay_payment_id: response.razorpay_payment_id,
-                      razorpay_signature: response.razorpay_signature,
-                    }),
-                  });
+              handler: function (response) {
+                // Build query params with Razorpay response
+                const params = new URLSearchParams({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                });
 
-                  const verifyData = await verifyResponse.json();
-
-                  if (verifyData.success) {
-                    window.location.href = verifyData.redirect_url;
-                  } else {
-                    alert("Payment verification failed: " + verifyData.error);
-                    window.location.href = "/";
-                  }
-                } catch (error) {
-                  alert("Payment verification error: " + error.message);
-                }
+                // Redirect user to loader page
+                window.location.href = "/payment-loader?" + params.toString();
               },
               modal: {
                 ondismiss: function () {
