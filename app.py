@@ -243,6 +243,7 @@ def admin_validate_qr():
     qr_data = data.get("qr_data", "").strip()
     admin_token = data.get("admin_token", "")
 
+    print(qr_data, admin_token)
     if admin_token not in admin_sessions:
         return jsonify({"valid": False, "message": "Unauthorized"}), 401
 
@@ -346,6 +347,10 @@ def admin_scanner():
 @app.route("/scanner")
 def scanner():
     return render_template("scanner.html")
+
+@app.route("/health")
+def health_check():
+    return "OK", 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

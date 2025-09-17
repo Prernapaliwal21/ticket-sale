@@ -8,97 +8,89 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
       @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(-20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
       }
-      .animate-fadeIn {
-        animation: fadeIn 0.3s ease;
+      .animate-fadeIn { animation: fadeIn 0.5s ease; }
+
+      .sticker {
+        animation: festivalGlow 8s ease infinite, gradientMove 6s ease infinite,
+          pulse 2s ease-in-out infinite;
+      }
+      @keyframes festivalGlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      @keyframes gradientMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
       }
     </style>
   </head>
-  <body class="text-gray-800 relative">
-    <!-- Background with gradient overlay -->
-    <div
-      class="fixed top-0 left-0 w-full h-full -z-10 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900"
-    ></div>
+  <body class="text-gray-800 relative font-sans">
 
-    <!-- Hero Banner -->
-    <!-- <div class="relative w-full h-screen flex flex-col items-center justify-center bg-black/50 text-center">
-        <h1 class="text-5xl md:text-6xl font-bold text-white drop-shadow-lg">Mona Squad Festival</h1>
-        <p class="mt-4 text-xl text-white drop-shadow">Join us for music, dance & celebrations</p>
-        <button onclick="openBookingForm('Mona Squad Festival 2025')" 
-                class="mt-8 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all transform hover:scale-105">
-            Book Tickets Now - Rs.{{ price }} per ticket
-        </button>
-    </div> -->
-    <!-- Hero Banner with Video Background -->
-    <!-- Hero Banner with Vertical Video Background -->
-    <div
-      class="relative w-full h-screen flex flex-col items-center justify-center text-center overflow-hidden"
-    >
-      <!-- Background Video (Vertical/Portrait) -->
-      <video
-        autoplay
-        muted
-        loop
-        playsinline
-        class="absolute inset-0 w-full h-full object-cover -z-10"
-      >
-        <source
-          src="/static/videos/festival-bg-vertical.mp4"
-          type="video/mp4"
-        />
+    <!-- Video Background -->
+    <div class="fixed top-0 left-0 w-full h-full -z-10">
+      <video autoplay muted loop playsinline class="w-full h-full object-cover">
+        <source src="/static/videos/festival-bg-vertical.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
+      <div class="absolute inset-0 bg-black/50"></div>
+    </div>
 
-      <!-- Dark Overlay -->
-      <div class="absolute inset-0 bg-black/50 -z-10"></div>
+    <!-- Sticker Logo -->
+    <div class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+      <img
+        src="/static/images/garba-sticker.png"
+        alt="Mona Squad Garba Festival"
+        class="w-72 sm:w-96 h-auto object-contain animate-fadeIn drop-shadow-lg rounded-md bg-white/20 p-2 sticker"
+      />
+    </div>
 
-      <!-- Content -->
-      <h1 class="text-5xl md:text-6xl font-bold text-white drop-shadow-lg">
-        Mona Squad Dandiya Festival
+    <!-- Hero Section -->
+    <div class="relative w-full h-screen flex flex-col items-center justify-center text-center z-10 px-4">
+      <h1 class="text-3xl sm:text-5xl font-extrabold text-white drop-shadow mb-4">
+        Join Us for Music, Dance & Celebrations
       </h1>
-      <p class="mt-4 text-xl text-white drop-shadow">
-        Join us for music, dance & celebrations
+      <p class="text-lg sm:text-xl text-white max-w-xl mx-auto mb-6">
+        Experience the vibrant energy of Garba Festival 2025 with live music, traditional dance & unforgettable vibes!
       </p>
       <button
         onclick="openBookingForm('Mona Squad Dandiya Festival 2025')"
-        class="mt-8 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all transform hover:scale-105"
+        class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all transform hover:scale-105 shadow-lg"
       >
-        Book Tickets Now - Rs.{{ price }} per ticket
+        Book Tickets Now - Rs.200 per ticket
       </button>
     </div>
 
     <!-- Festival Info Section -->
-    <!-- Festival Info Section -->
-    <section class="max-w-6xl mx-auto px-4 py-12 relative z-10">
+    <section class="max-w-6xl mx-auto px-4 py-16 relative z-10">
       <div class="bg-white/90 rounded-2xl shadow-xl p-8 backdrop-blur">
-        <h2 class="text-3xl font-bold text-center mb-8">Festival Highlights</h2>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div class="text-center p-6">
-            <div class="text-4xl mb-4">🎵</div>
+        <h2 class="text-3xl font-bold text-center mb-12">Festival Highlights</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div class="text-center p-6 bg-white rounded-xl shadow hover:shadow-lg transition">
+            <div class="text-5xl mb-4">🎵</div>
             <h3 class="text-xl font-bold mb-2">Live Music</h3>
-            <p class="text-gray-600">Amazing artists and performances</p>
+            <p class="text-gray-600">Enjoy electrifying performances all night long</p>
           </div>
-          <div class="text-center p-6">
-            <div class="text-4xl mb-4">💃</div>
+          <div class="text-center p-6 bg-white rounded-xl shadow hover:shadow-lg transition">
+            <div class="text-5xl mb-4">💃</div>
             <h3 class="text-xl font-bold mb-2">Dance & Culture</h3>
-            <p class="text-gray-600">Traditional and modern dance forms</p>
+            <p class="text-gray-600">Immerse yourself in traditional Garba vibes</p>
           </div>
-          <div class="text-center p-6">
-            <div class="text-4xl mb-4">🍛</div>
+          <div class="text-center p-6 bg-white rounded-xl shadow hover:shadow-lg transition">
+            <div class="text-5xl mb-4">🍛</div>
             <h3 class="text-xl font-bold mb-2">Food & Fun</h3>
-            <p class="text-gray-600">Delicious food and entertainment</p>
+            <p class="text-gray-600">Relish delicious food stalls & fun games</p>
           </div>
-          <!-- Contact Us Box -->
-          <div class="text-center p-6">
-            <div class="text-4xl mb-4">📞</div>
+          <div class="text-center p-6 bg-white rounded-xl shadow hover:shadow-lg transition">
+            <div class="text-5xl mb-4">📞</div>
             <h3 class="text-xl font-bold mb-2">Contact Us</h3>
             <button
               onclick="openContactPopup()"
@@ -112,82 +104,37 @@
     </section>
 
     <!-- Contact Popup -->
-    <div
-      id="contactPopup"
-      class="hidden fixed top-0 left-0 w-full h-full bg-black/60 flex justify-center items-center z-50"
-    >
-      <div
-        class="bg-white p-6 rounded-2xl w-80 shadow-lg animate-fadeIn text-center"
-      >
+    <div id="contactPopup" class="hidden fixed top-0 left-0 w-full h-full bg-black/60 flex justify-center items-center z-50">
+      <div class="bg-white p-6 rounded-2xl w-80 shadow-lg animate-fadeIn text-center">
         <h2 class="text-xl font-bold mb-4">📞 Contact Us</h2>
         <p class="text-gray-700"><strong>Phone:</strong> +91 9929061035</p>
-        <p class="text-gray-700 mt-2">
-          <strong>Email:</strong> monasquad4@gmail.com
-        </p>
-        <button
-          onclick="closeContactPopup()"
-          class="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
-        >
+        <p class="text-gray-700 mt-2"><strong>Email:</strong> monasquad4@gmail.com</p>
+        <button onclick="closeContactPopup()" class="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
           Close
         </button>
       </div>
     </div>
 
-    <script>
-      function openContactPopup() {
-        document.getElementById("contactPopup").classList.remove("hidden");
-      }
-      function closeContactPopup() {
-        document.getElementById("contactPopup").classList.add("hidden");
-      }
-    </script>
-
-    <!-- Popup Overlay -->
-    <div
-      id="bookingPopup"
-      class="hidden fixed top-0 left-0 w-full h-full bg-black/60 flex justify-center items-center z-50"
-    >
+    <!-- Booking Popup -->
+    <div id="bookingPopup" class="hidden fixed top-0 left-0 w-full h-full bg-black/60 flex justify-center items-center z-50">
       <div class="bg-white p-6 rounded-2xl w-96 shadow-lg animate-fadeIn">
-        <h2 class="text-xl font-bold text-center mb-4">
-          Book Your Festival Tickets
-        </h2>
+        <h2 class="text-xl font-bold text-center mb-4">Book Your Festival Tickets</h2>
         <form id="bookingForm" class="flex flex-col gap-3">
-          <input
-            type="text"
-            id="name"
-            placeholder="Full Name"
-            class="border rounded-lg px-3 py-2"
-            required
-          />
-          <input
-            type="tel"
-            id="phone"
-            placeholder="Phone Number"
-            class="border rounded-lg px-3 py-2"
-            required
-          />
+          <input type="text" id="name" placeholder="Full Name" class="border rounded-lg px-3 py-2" required />
+          <input type="tel" id="phone" placeholder="Phone Number" class="border rounded-lg px-3 py-2" required />
           <select id="quantity" class="border rounded-lg px-3 py-2" required>
-            <option value="1">1 Ticket - Rs.{{ price }}</option>
-            <option value="2">2 Tickets - Rs.{{ price * 2 }}</option>
-            <option value="3">3 Tickets - Rs.{{ price * 3 }}</option>
-            <option value="4">4 Tickets - Rs.{{ price * 4 }}</option>
-            <option value="5">5 Tickets - Rs.{{ price * 5 }}</option>
+            <option value="1">1 Ticket - Rs.200</option>
+            <option value="2">2 Tickets - Rs.400</option>
+            <option value="3">3 Tickets - Rs.600</option>
+            <option value="4">4 Tickets - Rs.800</option>
+            <option value="5">5 Tickets - Rs.1000</option>
           </select>
-          <div class="text-sm text-gray-600 mt-2">
-            Each ticket includes entry to all festival activities
-          </div>
+          <div class="text-sm text-gray-600 mt-2">Each ticket includes entry to all festival activities</div>
           <div class="flex justify-between mt-3">
-            <button
-              type="submit"
-              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
-            >
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
               Proceed to Pay
             </button>
-            <button
-              type="button"
-              onclick="closeBookingForm()"
-              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
-            >
+            <button type="button" onclick="closeBookingForm()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
               Cancel
             </button>
           </div>
@@ -196,73 +143,51 @@
     </div>
 
     <script>
-      function openBookingForm(festival) {
-        document.getElementById("bookingPopup").classList.remove("hidden");
-      }
+      function openContactPopup() { document.getElementById("contactPopup").classList.remove("hidden"); }
+      function closeContactPopup() { document.getElementById("contactPopup").classList.add("hidden"); }
+      function openBookingForm() { document.getElementById("bookingPopup").classList.remove("hidden"); }
+      function closeBookingForm() { document.getElementById("bookingPopup").classList.add("hidden"); }
 
-      function closeBookingForm() {
-        document.getElementById("bookingPopup").classList.add("hidden");
-      }
+      document.getElementById("bookingForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const name = document.getElementById("name").value;
+        const phone = document.getElementById("phone").value;
+        const quantity = parseInt(document.getElementById("quantity").value);
 
-      document
-        .getElementById("bookingForm")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
+        try {
+          const response = await fetch("/create-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, phone, quantity }),
+          });
 
-          const name = document.getElementById("name").value;
-          const phone = document.getElementById("phone").value;
-          const quantity = parseInt(document.getElementById("quantity").value);
+          const orderData = await response.json();
+          if (orderData.error) { alert("Error: " + orderData.error); return; }
 
-          try {
-            const response = await fetch("/create-order", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ name, phone, quantity }),
-            });
-
-            const orderData = await response.json();
-
-            if (orderData.error) {
-              alert("Error: " + orderData.error);
-              return;
-            }
-
-            const options = {
-              key: "{{ razorpay_key_id }}",
-              amount: orderData.amount,
-              currency: orderData.currency,
-              name: "Mona Squad Dandiya Festival",
-              description: "Festival Entry Pass",
-              order_id: orderData.order_id,
-              prefill: {
-                name: orderData.name,
-                contact: orderData.phone,
-              },
-              theme: { color: "#4F46E5" },
-              handler: function (response) {
-                // Build query params with Razorpay response
-                const params = new URLSearchParams({
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature,
-                });
-
-                // Redirect user to loader page
-                window.location.href = "/payment-loader?" + params.toString();
-              },
-              modal: {
-                ondismiss: function () {
-                  console.log("Payment modal closed");
-                },
-              },
-            };
-
-            const rzp = new Razorpay(options);
-            rzp.open();
-          } catch (error) {
-            alert("Error: " + error.message);
-          }
-        });
+          const options = {
+            key: "{{ razorpay_key_id }}",
+            amount: orderData.amount,
+            currency: orderData.currency,
+            name: "Mona Squad Dandiya Festival",
+            description: "Festival Entry Pass",
+            order_id: orderData.order_id,
+            prefill: { name: orderData.name, contact: orderData.phone },
+            theme: { color: "#4F46E5" },
+            handler: function (response) {
+              const params = new URLSearchParams({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              });
+              window.location.href = "/payment-loader?" + params.toString();
+            },
+          };
+          const rzp = new Razorpay(options);
+          rzp.open();
+        } catch (error) {
+          alert("Error: " + error.message);
+        }
+      });
     </script>
   </body>
 </html>
