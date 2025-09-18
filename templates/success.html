@@ -1,4 +1,3 @@
-<!-- Save this as templates/success.html -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -6,63 +5,267 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Payment Success - Mona Squad</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <style>
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+
       @keyframes bounce {
-        0%, 20%, 53%, 80%, 100% { transform: translate3d(0, 0, 0); }
-        40%, 43% { transform: translate3d(0, -30px, 0); }
-        70% { transform: translate3d(0, -15px, 0); }
-        90% { transform: translate3d(0, -4px, 0); }
+        0%,
+        20%,
+        53%,
+        80%,
+        100% {
+          transform: translate3d(0, 0, 0);
+        }
+        40%,
+        43% {
+          transform: translate3d(0, -30px, 0);
+        }
+        70% {
+          transform: translate3d(0, -15px, 0);
+        }
+        90% {
+          transform: translate3d(0, -4px, 0);
+        }
       }
       .bounce {
         animation: bounce 1s ease-in-out;
       }
 
-      .ticket-card {
-        background-color: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        position: relative;
-      }
-
-      .ticket-card::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: url("{{ url_for('static', filename='images/ticket-bg.png') }}")
-          center/contain no-repeat;
-        opacity: 0.25;
-        filter: contrast(1.2) brightness(1.1);
-        z-index: 1;
-      }
-
       @media print {
-        body * { visibility: hidden; }
-        .printable, .printable * { visibility: visible; }
-        .printable { position: absolute; top: 0; left: 0; width: 100%; }
-        .no-print { display: none !important; }
+        body * {
+          visibility: hidden;
+        }
+        .printable,
+        .printable * {
+          visibility: visible;
+        }
+        .printable {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+        }
+        .no-print {
+          display: none !important;
+        }
+      }
+
+      /* Ticket Design */
+      :root {
+        --gold: #e29d38;
+        --deep-purple: #521035;
+        --maroon: #841b3b;
+        --warm: #c2532b;
+        --offwhite: #e4dfda;
+        --shadow-dark: rgba(35, 7, 13, 0.6);
+      }
+
+      .ticket {
+        position: relative;
+        width: 100%;
+        max-width: 900px;
+        height: auto;
+        border-radius: 18px;
+        padding: 20px;
+        box-sizing: border-box;
+        color: var(--offwhite);
+        background: linear-gradient(
+          135deg,
+          var(--warm) 0%,
+          var(--deep-purple) 48%,
+          var(--maroon) 100%
+        );
+        box-shadow: 0 18px 40px var(--shadow-dark);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow: hidden;
+        margin: 0 auto;
+      }
+
+      .header-row {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+        text-align: center;
+      }
+
+      .logo {
+        width: 100px;
+      }
+      .logo img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .festival {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--gold);
+        line-height: 1.1;
+      }
+
+      .year {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--gold);
+        margin-top: 4px;
+      }
+
+      .details {
+        margin-top: 12px;
+        font-size: 14px;
+        line-height: 1.6;
+        text-align: center;
+      }
+      .details .label {
+        font-weight: 700;
+        display: inline-block;
+        width: 70px;
+        text-transform: uppercase;
+      }
+
+      .meta {
+        margin-top: 12px;
+        font-size: 14px;
+        text-align: center;
+      }
+      .meta .holder {
+        font-weight: 700;
+        margin-top: 6px;
+      }
+      .meta .price {
+        font-weight: 700;
+        margin-top: 6px;
+      }
+
+      .right {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        margin-top: 20px;
+        width: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+      .qr-wrap {
+        width: 120px;
+        height: 120px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+      }
+      .qr-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .gate {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--gold);
+      }
+      .entry {
+        font-size: 14px;
+      }
+
+      /* Larger devices */
+      @media (min-width: 768px) {
+        .ticket {
+          flex-direction: row;
+          align-items: flex-start;
+          padding: 30px 36px;
+        }
+        .header-row {
+          flex-direction: row;
+          text-align: left;
+        }
+        .festival {
+          font-size: 44px;
+        }
+        .year {
+          font-size: 36px;
+        }
+        .details {
+          text-align: left;
+          font-size: 18px;
+        }
+        .meta {
+          text-align: left;
+          font-size: 18px;
+        }
+        .right {
+          position: absolute;
+          right: 30px;
+          bottom: 30px;
+          margin-top: 0;
+        }
+        .qr-wrap {
+          width: 150px;
+          height: 150px;
+        }
+        .gate {
+          font-size: 22px;
+        }
+        .entry {
+          font-size: 16px;
+        }
       }
     </style>
   </head>
-  <body class="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen py-6 sm:py-8">
+  <body
+    class="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen py-6 sm:py-8"
+  >
     <div class="max-w-4xl mx-auto px-4">
-      
       <!-- ✅ Success Header -->
       <div class="bg-white rounded-2xl shadow-xl p-8 text-center mb-8">
         <div class="mb-6">
-          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto bounce">
-            <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          <div
+            class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto bounce"
+          >
+            <svg
+              class="w-8 h-8 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              />
             </svg>
           </div>
         </div>
-        <h1 class="text-3xl font-bold text-green-600 mb-2">Payment Successful!</h1>
+        <h1 class="text-3xl font-bold text-green-600 mb-2">
+          Payment Successful!
+        </h1>
         <p class="text-gray-600 mb-4">
           Your {{ quantity }} ticket(s) have been generated successfully.
         </p>
 
         <!-- ✅ Payment Summary -->
         <div class="bg-gray-50 rounded-xl p-4 mb-6 text-sm">
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <span class="text-gray-600">Payment ID:</span>
               <p class="font-mono text-xs">{{ payment_id }}</p>
@@ -85,83 +288,86 @@
             </div>
             <div>
               <span class="text-gray-600">Total Amount:</span>
-              <p class="font-bold text-green-600">Rs.{{ "%.2f"|format(total) }}</p>
+              <p class="font-bold text-green-600">
+                Rs.{{ "%.2f"|format(total) }}
+              </p>
             </div>
           </div>
         </div>
 
         <!-- ✅ PDF Download Button -->
         <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-          <a href="/download-pdf/{{ payment_id }}"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors inline-flex items-center justify-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <a
+            href="/download-pdf/{{ payment_id }}"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors inline-flex items-center justify-center"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
             Download PDF Tickets
           </a>
         </div>
       </div>
 
-      <!-- ✅ Ticket Cards -->
+      <!-- ✅ Ticket Section -->
       <div class="printable">
-        <h2 class="text-2xl font-bold text-center mb-6">Your Festival Entry Tickets</h2>
+        <h2 class="text-2xl font-bold text-center mb-6">
+          Your Festival Entry Tickets
+        </h2>
         <div class="space-y-6">
           {% for ticket in tickets %}
-          <div class="ticket-card rounded-2xl p-4 sm:p-6 bg-white shadow-lg relative">
-            <div class="ticket-card-content relative z-10">
-              <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                
-                <!-- Left: Ticket Info -->
-                <div class="flex-1 w-full">
-                  <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-                    <h3 class="text-lg sm:text-xl font-bold text-gray-800">Mona Squad Dandiya Festival 2025</h3>
-                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs sm:text-sm font-semibold">
-                      Ticket #{{ loop.index }}
-                    </span>
-                  </div>
-
-                  <div class="grid grid-cols-2 gap-3 text-xs sm:text-sm">
-                    <div>
-                      <span class="text-gray-600">Ticket ID:</span>
-                      <p class="font-mono font-semibold break-words">{{ ticket.ticket_id }}</p>
-                    </div>
-                    <div>
-                      <span class="text-gray-600">Holder Name:</span>
-                      <p class="font-semibold">{{ ticket.name }}</p>
-                    </div>
-                    <div>
-                      <span class="text-gray-600">Phone:</span>
-                      <p class="break-all">{{ ticket.phone }}</p>
-                    </div>
-                    <div>
-                      <span class="text-gray-600">Price (incl. GST):</span>
-                      <p class="font-semibold text-green-600">Rs.{{ "%.2f"|format(ticket.price_per_ticket) }}</p>
-                    </div>
-                  </div>
-
-                  <!-- Entry Instructions -->
-                  <div class="mt-3 p-2 sm:p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded text-xs sm:text-sm">
-                    <p class="text-yellow-800 font-medium">Entry Instructions:</p>
-                    <ul class="text-yellow-700 mt-1 space-y-1">
-                      <li>• Present this QR code at venue entrance</li>
-                      <li>• Gate will open after 7 PM</li>
-                      <li>• Each ticket valid for single entry only</li>
-                      <li>• Screenshot or printed copy both accepted</li>
-                    </ul>
-                  </div>
+          <div class="ticket mx-auto relative">
+            <div class="left">
+              <div class="header-row">
+                <div class="logo">
+                  <img
+                    src="/static/images/mona-squad-logo.png"
+                    alt="Mona Squad logo"
+                  />
                 </div>
-
-                <!-- Right: QR Code -->
-                <div class="flex-shrink-0 w-full sm:w-auto flex justify-center">
-                  <div class="bg-white p-3 sm:p-4 rounded-xl shadow-inner">
-                    <img
-                      src="data:image/png;base64,{{ ticket.qr_code }}"
-                      alt="QR Code for {{ ticket.ticket_id }}"
-                      class="w-28 h-28 sm:w-36 sm:h-36"
-                    />
-                  </div>
+                <div class="title-section">
+                  <div class="festival">GARBA FESTIVAL</div>
+                  <div class="year">2025</div>
                 </div>
+              </div>
+
+              <div class="details">
+                <div><span class="label">Date</span> 4TH OCT 2025</div>
+                <div><span class="label">Time</span> 6:30 PM ONWARDS</div>
+                <div>
+                  <span class="label">Venue</span> VISHWAS SWAROOPAM GARDEN,
+                  NATHDWARA
+                </div>
+              </div>
+
+              <div class="meta">
+                <div class="holder">Holder: {{ ticket.name }}</div>
+                <div class="price">
+                  Price: ₹{{ "%.2f"|format(ticket.price_per_ticket) }}
+                </div>
+              </div>
+            </div>
+
+            <div class="right">
+              <div class="qr-wrap">
+                <img
+                  src="data:image/png;base64,{{ ticket.qr_code }}"
+                  alt="QR Code"
+                />
+              </div>
+              <div style="text-align: center">
+                <div class="gate">Gate No. 2</div>
+                <div class="entry">Single Entry</div>
               </div>
             </div>
           </div>
@@ -171,7 +377,10 @@
 
       <!-- ✅ Back to Home -->
       <div class="no-print text-center mt-8">
-        <a href="/" class="inline-block bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-colors">
+        <a
+          href="/"
+          class="inline-block bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-colors"
+        >
           Back to Home
         </a>
       </div>
