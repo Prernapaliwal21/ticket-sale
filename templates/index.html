@@ -8,120 +8,470 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
       @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
-      .animate-fadeIn { animation: fadeIn 0.5s ease; }
+      .animate-fadeIn {
+        animation: fadeIn 0.5s ease;
+      }
 
       .sticker {
         animation: festivalGlow 8s ease infinite, gradientMove 6s ease infinite,
           pulse 2s ease-in-out infinite;
       }
       @keyframes festivalGlow {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
       }
       @keyframes gradientMove {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
       }
       @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.7; }
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      /* Hide scrollbar */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
       }
     </style>
   </head>
   <body class="text-gray-800 relative font-sans">
-
     <!-- Video Background -->
     <div class="fixed top-0 left-0 w-full h-full -z-10">
       <video autoplay muted loop playsinline class="w-full h-full object-cover">
-        <source src="/static/videos/festival-bg-vertical.mp4" type="video/mp4" />
+        <source
+          src="/static/videos/festival-bg-vertical.mp4"
+          type="video/mp4"
+        />
         Your browser does not support the video tag.
       </video>
       <div class="absolute inset-0 bg-black/50"></div>
     </div>
 
     <!-- Sticker Logo -->
-    <div class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+    <!-- <div class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
       <img
         src="/static/images/garba-sticker.png"
         alt="Mona Squad Garba Festival"
         class="w-72 sm:w-96 h-auto object-contain animate-fadeIn drop-shadow-lg rounded-md bg-white/20 p-2 sticker"
       />
-    </div>
+    </div> -->
 
     <!-- Hero Section -->
-    <div class="relative w-full h-screen flex flex-col items-center justify-center text-center z-10 px-4">
-       <h1 class="text-3xl sm:text-5xl font-extrabold text-white drop-shadow mb-4">
+    <div
+      class="relative w-full h-screen flex flex-col items-center justify-center text-center z-10 px-4 pb-48"
+    >
+      <!-- Social Buttons - Top Right -->
+      <div class="absolute top-4 right-4 flex gap-3 z-50">
+        <!-- Instagram -->
+        <a
+          href="https://www.instagram.com/mona_squad?igsh=dGpzczdvZ2lvc3ky"
+          target="_blank"
+          class="bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+            class="w-5 h-5"
+          >
+            <path
+              d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9A5.5 5.5 0 0 1 16.5 22h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm5.25-2.75a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0Z"
+            />
+          </svg>
+        </a>
+
+        <!-- Gmail -->
+        <a
+          href="mailto:monasquad4@gmail.com"
+          class="bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+            class="w-5 h-5"
+          >
+            <path
+              d="M20 4H4a2 2 0 0 0-2 2v12a2 
+               2 0 0 0 2 2h16a2 2 0 0 0 
+               2-2V6a2 2 0 0 0-2-2Zm0 
+               4.5-8 5-8-5V6l8 5 8-5v2.5Z"
+            />
+          </svg>
+        </a>
+
+        <!-- YouTube -->
+        <a
+          href="https://youtube.com/@khushhalsaini4147?si=nmotWXEc1Zf5clIN"
+          target="_blank"
+          class="bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+            class="w-5 h-5"
+          >
+            <path
+              d="M23.5 6.2s-.2-1.6-.8-2.3c-.7-.9-1.5-.9-1.9-1C17.6 2.5 12 2.5 12 
+               2.5h-.1s-5.6 0-8.8.4c-.4.1-1.2.1-1.9 1-.6.7-.8 2.3-.8 
+               2.3S0 8.1 0 10v1.9c0 1.9.2 3.8.2 3.8s.2 1.6.8 
+               2.3c.7.9 1.6.9 2 1 1.4.1 5.8.4 8.9.4s8.8-.1 
+               8.8-.1.9 0 1.9-1c.6-.7.8-2.3.8-2.3s.2-1.9.2-3.8V10c0-1.9-.2-3.8-.2-3.8ZM9.7 
+               14.6V8.3l6.3 3.2-6.3 3.1Z"
+            />
+          </svg>
+        </a>
+
+        <!-- Phone -->
+        <a
+          href="tel:+917665588420"
+          class="bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition flex items-center justify-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+            class="w-5 h-5"
+          >
+            <path
+              d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 
+       1 0 0 1 1.01-.24c1.12.37 2.33.57 
+       3.58.57a1 1 0 0 1 1 1V20a1 
+       1 0 0 1-1 1c-9.39 0-17-7.61-17-17a1 
+       1 0 0 1 1-1h3.5a1 1 0 0 1 1 
+       1c0 1.25.2 2.46.57 3.58a1 1 
+       0 0 1-.24 1.01l-2.2 2.2Z"
+            />
+          </svg>
+        </a>
+      </div>
+
+      <!-- Logo -->
+      <img
+        src="/static/images/garba-sticker.png"
+        alt="Mona Squad Garba Festival"
+        class="w-56 sm:w-72 h-auto object-contain animate-fadeIn drop-shadow-2xl"
+      />
+
+      <!-- Heading -->
+      <h1
+        class="text-2xl sm:text-2xl font-extrabold text-white drop-shadow mb-4"
+      >
         Join Us for Music, Dance & Celebrations
-      </h1> 
-      <!-- <p class="text-lg sm:text-xl text-white max-w-xl mx-auto mb-6">
-        Experience the vibrant energy of Garba Festival 2025 with live music, traditional dance & unforgettable vibes!
-      </p>  -->
+      </h1>
+
+      <!-- Button -->
       <button
         onclick="openBookingForm('Mona Squad Dandiya Festival 2025')"
-        class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all transform hover:scale-105 shadow-lg"
+        class="px-6 py-3 md:px-5 md:py-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold rounded-full text-base md:text-lg shadow-xl hover:shadow-2xl transition-all transform hover:scale-110"
       >
-        Book Ticket Now
+        🎟️ Book Ticket Now
       </button>
     </div>
 
     <!-- Festival Info Section -->
     <section class="max-w-6xl mx-auto px-4 py-16 relative z-10">
-      <div class="bg-white/90 rounded-2xl shadow-xl p-8 backdrop-blur">
-        <h2 class="text-3xl font-bold text-center mb-12">Festival Highlights</h2>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div class="text-center p-6 bg-white rounded-xl shadow hover:shadow-lg transition">
-            <div class="text-5xl mb-4">🎵</div>
-            <h3 class="text-xl font-bold mb-2">Live Music</h3>
-            <p class="text-gray-600">Enjoy electrifying performances all night long</p>
-          </div>
-          <div class="text-center p-6 bg-white rounded-xl shadow hover:shadow-lg transition">
-            <div class="text-5xl mb-4">💃</div>
-            <h3 class="text-xl font-bold mb-2">Dance & Culture</h3>
-            <p class="text-gray-600">Immerse yourself in traditional Garba vibes</p>
-          </div>
-          <div class="text-center p-6 bg-white rounded-xl shadow hover:shadow-lg transition">
-            <div class="text-5xl mb-4">🍛</div>
-            <h3 class="text-xl font-bold mb-2">Food & Fun</h3>
-            <p class="text-gray-600">Relish delicious food stalls & fun games</p>
-          </div>
-          <div class="text-center p-6 bg-white rounded-xl shadow hover:shadow-lg transition">
-            <div class="text-5xl mb-4">📞</div>
-            <h3 class="text-xl font-bold mb-2">Contact Us</h3>
-            <button
-              onclick="openContactPopup()"
-              class="mt-3 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition"
+      <div class="rounded-2xl p-8">
+        <!-- <h2 class="text-3xl font-bold text-center mb-12 text-white">
+          Festival Highlights
+        </h2> -->
+
+        <!-- Sponsors Row -->
+     
+        <div class="mb-16 relative">
+          <h3 class="text-2xl font-bold mb-6 text-center text-white">
+            🎉 Our Sponsors
+          </h3>
+          <div
+            id="sponsorContainer"
+            class="flex space-x-6 overflow-x-auto no-scrollbar scroll-smooth px-12"
+          >
+            <div
+              class="min-w-[200px] bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-4 text-center flex-shrink-0 hover:scale-105 transition"
             >
-              View Details
-            </button>
+              <img
+                src="/static/images/sponsor1.png"
+                alt="Sponsor 1"
+                class="mx-auto h-28 object-contain mb-3"
+              />
+              <p class="font-semibold text-white">Shake Plus</p>
+            </div>
+            <div
+              class="min-w-[200px] bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-4 text-center flex-shrink-0 hover:scale-105 transition"
+            >
+              <img
+                src="/static/images/sponsor2.png"
+                alt="Sponsor 2"
+                class="mx-auto h-28 object-contain mb-3"
+              />
+              <p class="font-semibold text-white">Mangal Murti</p>
+              <p class="font-semibold text-white">Furnitures</p>
+            </div>
+            <div
+              class="min-w-[200px] bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-4 text-center flex-shrink-0 hover:scale-105 transition"
+            >
+              <img
+                src="/static/images/sponsor3.png"
+                alt="Sponsor 3"
+                class="mx-auto h-28 object-contain mb-3"
+              />
+              <p class="font-semibold text-white">Shree Krishna</p>
+              <p class="font-semibold text-white">Automobiles</p>
+            </div>
+            <div
+              class="min-w-[200px] bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-4 text-center flex-shrink-0 hover:scale-105 transition"
+            >
+              <img
+                src="/static/images/sponsor4.png"
+                alt="Sponsor 4"
+                class="mx-auto h-28 object-contain mb-3"
+              />
+              <p class="font-semibold text-white">Shree Radha Raman</p>
+              <p class="font-semibold text-white">Exclusive Mens Wear</p>
+            </div>
+          </div>
+
+          <!-- Left Arrow
+          <button
+            onclick="scrollContainerLeft('sponsorContainer')"
+            class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-10 h-10 flex items-center justify-center rounded-full shadow-lg transition"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+
+           Right Arrow -->
+          <!-- <button
+            onclick="scrollContainerRight('sponsorContainer')"
+            class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-10 h-10 flex items-center justify-center rounded-full shadow-lg transition"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button> -->
+        </div>
+        <!-- Paid Partners Row -->
+        <div class="mb-16 relative">
+          <h3 class="text-2xl font-bold mb-6 text-center text-white">
+            🤝 Paid Partners
+          </h3>
+          <div
+            id="partnerContainer"
+            class="flex space-x-6 overflow-x-auto no-scrollbar scroll-smooth px-12"
+          >
+            <div
+              class="min-w-[200px] bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-4 text-center flex-shrink-0 hover:scale-105 transition"
+            >
+              <img
+                src="/static/images/partner1.png"
+                alt="Partner 1"
+                class="mx-auto h-28 object-contain mb-3"
+              />
+              <p class="font-semibold text-white">SS Photography</p>
+            </div>
+            <div
+              class="min-w-[200px] bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-4 text-center flex-shrink-0 hover:scale-105 transition"
+            >
+              <img
+                src="/static/images/partner2.png"
+                alt="Partner 2"
+                class="mx-auto h-28 object-contain mb-3"
+              />
+              <p class="font-semibold text-white">ShreeJi Sound</p>
+            </div>
+            <div
+              class="min-w-[200px] bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-4 text-center flex-shrink-0 hover:scale-105 transition"
+            >
+              <img
+                src="/static/images/partner3.png"
+                alt="Partner 3"
+                class="mx-auto h-28 object-contain mb-3"
+              />
+              <p class="font-semibold text-white">D Lensclick</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- festival highlights -->
+        <div class="mb-16 relative">
+          <h3 class="text-2xl font-bold mb-6 text-center text-white">
+            🎬 Festival Highlights (YouTube)
+          </h3>
+          <div
+            id="festivalHighlightContainer"
+            class="flex space-x-4 sm:space-x-6 overflow-x-auto no-scrollbar scroll-smooth px-4 sm:px-12"
+          >
+            <!-- Festival 2021 -->
+            <a
+              href="https://youtu.be/E1sDIqtG9c4?si=Csd-hW4e6MzwkJh4"
+              target="_blank"
+              class="min-w-[200px] sm:min-w-[240px] md:min-w-[280px] bg-white/10 backdrop-blur-md rounded-2xl shadow-lg overflow-hidden flex-shrink-0 hover:scale-105 transition"
+            >
+              <img
+                src="https://img.youtube.com/vi/E1sDIqtG9c4/hqdefault.jpg"
+                alt="Festival 2021 Video"
+                class="w-full h-32 sm:h-36 md:h-40 object-cover"
+              />
+              <p class="font-semibold text-white text-center py-2 sm:py-3">
+                Festival 2021
+              </p>
+            </a>
+
+            <!-- Festival 2022 -->
+            <a
+              href="https://youtu.be/fv9pBv9f3cw?si=l-sSuuztuPWROGir"
+              target="_blank"
+              class="min-w-[200px] sm:min-w-[240px] md:min-w-[280px] bg-white/10 backdrop-blur-md rounded-2xl shadow-lg overflow-hidden flex-shrink-0 hover:scale-105 transition"
+            >
+              <img
+                src="https://img.youtube.com/vi/fv9pBv9f3cw/hqdefault.jpg"
+                alt="Festival 2022 Video"
+                class="w-full h-32 sm:h-36 md:h-40 object-cover"
+              />
+              <p class="font-semibold text-white text-center py-2 sm:py-3">
+                Festival 2022
+              </p>
+            </a>
+
+            <!-- Festival 2023 -->
+            <a
+              href="https://youtu.be/Ga5zieYu_4U?si=q8TEh1-ojveMjrno"
+              target="_blank"
+              class="min-w-[200px] sm:min-w-[240px] md:min-w-[280px] bg-white/10 backdrop-blur-md rounded-2xl shadow-lg overflow-hidden flex-shrink-0 hover:scale-105 transition"
+            >
+              <img
+                src="https://img.youtube.com/vi/Ga5zieYu_4U/hqdefault.jpg"
+                alt="Festival 2023 Video"
+                class="w-full h-32 sm:h-36 md:h-40 object-cover"
+              />
+              <p class="font-semibold text-white text-center py-2 sm:py-3">
+                Festival 2023
+              </p>
+            </a>
+
+            <!-- Festival 2024 -->
+            <a
+              href="https://youtu.be/BhTFv3gF5Gc?si=4yrDcSBYQNv1dBYj"
+              target="_blank"
+              class="min-w-[200px] sm:min-w-[240px] md:min-w-[280px] bg-white/10 backdrop-blur-md rounded-2xl shadow-lg overflow-hidden flex-shrink-0 hover:scale-105 transition"
+            >
+              <img
+                src="https://img.youtube.com/vi/BhTFv3gF5Gc/hqdefault.jpg"
+                alt="Festival 2024 Video"
+                class="w-full h-32 sm:h-36 md:h-40 object-cover"
+              />
+              <p class="font-semibold text-white text-center py-2 sm:py-3">
+                Festival 2024
+              </p>
+            </a>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Contact Popup -->
-    <div id="contactPopup" class="hidden fixed top-0 left-0 w-full h-full bg-black/60 flex justify-center items-center z-50">
-      <div class="bg-white p-6 rounded-2xl w-80 shadow-lg animate-fadeIn text-center">
+    <div
+      id="contactPopup"
+      class="hidden fixed top-0 left-0 w-full h-full bg-black/60 flex justify-center items-center z-50"
+    >
+      <div
+        class="bg-white p-6 rounded-2xl w-80 shadow-lg animate-fadeIn text-center"
+      >
         <h2 class="text-xl font-bold mb-4">📞 Contact Us</h2>
         <p class="text-gray-700"><strong>Phone:</strong> +91 9929061035</p>
-        <p class="text-gray-700 mt-2"><strong>Email:</strong> monasquad4@gmail.com</p>
-        <button onclick="closeContactPopup()" class="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
+        <p class="text-gray-700 mt-2">
+          <strong>Email:</strong> monasquad4@gmail.com
+        </p>
+        <button
+          onclick="closeContactPopup()"
+          class="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+        >
           Close
         </button>
       </div>
     </div>
 
     <!-- Booking Popup -->
-    <div id="bookingPopup" class="hidden fixed top-0 left-0 w-full h-full bg-black/60 flex justify-center items-center z-50">
+    <div
+      id="bookingPopup"
+      class="hidden fixed top-0 left-0 w-full h-full bg-black/60 flex justify-center items-center z-50"
+    >
       <div class="bg-white p-6 rounded-2xl w-96 shadow-lg animate-fadeIn">
-        <h2 class="text-xl font-bold text-center mb-4">Book Your Festival Tickets</h2>
+        <h2 class="text-xl font-bold text-center mb-4">
+          Book Your Festival Tickets
+        </h2>
         <form id="bookingForm" class="flex flex-col gap-3">
-          <input type="text" id="name" placeholder="Full Name" class="border rounded-lg px-3 py-2" required />
-          <input type="tel" id="phone" placeholder="Phone Number" class="border rounded-lg px-3 py-2" required />
+          <input
+            type="text"
+            id="name"
+            placeholder="Full Name"
+            class="border rounded-lg px-3 py-2"
+            required
+          />
+          <input
+            type="tel"
+            id="phone"
+            placeholder="Phone Number"
+            class="border rounded-lg px-3 py-2"
+            required
+          />
           <select id="quantity" class="border rounded-lg px-3 py-2" required>
             <option value="1">1 Ticket - Rs.200</option>
             <option value="2">2 Tickets - Rs.400</option>
@@ -129,12 +479,21 @@
             <option value="4">4 Tickets - Rs.800</option>
             <option value="5">5 Tickets - Rs.1000</option>
           </select>
-          <div class="text-sm text-gray-600 mt-2">Each ticket includes entry to all festival activities</div>
+          <div class="text-sm text-gray-600 mt-2">
+            Each ticket includes entry to all festival activities
+          </div>
           <div class="flex justify-between mt-3">
-            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+            <button
+              type="submit"
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+            >
               Proceed to Pay
             </button>
-            <button type="button" onclick="closeBookingForm()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
+            <button
+              type="button"
+              onclick="closeBookingForm()"
+              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+            >
               Cancel
             </button>
           </div>
@@ -143,51 +502,75 @@
     </div>
 
     <script>
-      function openContactPopup() { document.getElementById("contactPopup").classList.remove("hidden"); }
-      function closeContactPopup() { document.getElementById("contactPopup").classList.add("hidden"); }
-      function openBookingForm() { document.getElementById("bookingPopup").classList.remove("hidden"); }
-      function closeBookingForm() { document.getElementById("bookingPopup").classList.add("hidden"); }
+      function openContactPopup() {
+        document.getElementById("contactPopup").classList.remove("hidden");
+      }
+      function closeContactPopup() {
+        document.getElementById("contactPopup").classList.add("hidden");
+      }
+      function openBookingForm() {
+        document.getElementById("bookingPopup").classList.remove("hidden");
+      }
+      function closeBookingForm() {
+        document.getElementById("bookingPopup").classList.add("hidden");
+      }
 
-      document.getElementById("bookingForm").addEventListener("submit", async function (e) {
-        e.preventDefault();
-        const name = document.getElementById("name").value;
-        const phone = document.getElementById("phone").value;
-        const quantity = parseInt(document.getElementById("quantity").value);
+      // Scroll Controls (renamed to avoid conflict)
+      function scrollContainerLeft(id) {
+        document
+          .getElementById(id)
+          .scrollBy({ left: -300, behavior: "smooth" });
+      }
+      function scrollContainerRight(id) {
+        document.getElementById(id).scrollBy({ left: 300, behavior: "smooth" });
+      }
 
-        try {
-          const response = await fetch("/create-order", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, phone, quantity }),
-          });
+      // Booking Form
+      document
+        .getElementById("bookingForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const name = document.getElementById("name").value;
+          const phone = document.getElementById("phone").value;
+          const quantity = parseInt(document.getElementById("quantity").value);
 
-          const orderData = await response.json();
-          if (orderData.error) { alert("Error: " + orderData.error); return; }
+          try {
+            const response = await fetch("/create-order", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name, phone, quantity }),
+            });
 
-          const options = {
-            key: "{{ razorpay_key_id }}",
-            amount: orderData.amount,
-            currency: orderData.currency,
-            name: "Mona Squad Dandiya Festival",
-            description: "Festival Entry Pass",
-            order_id: orderData.order_id,
-            prefill: { name: orderData.name, contact: orderData.phone },
-            theme: { color: "#4F46E5" },
-            handler: function (response) {
-              const params = new URLSearchParams({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-              });
-              window.location.href = "/payment-loader?" + params.toString();
-            },
-          };
-          const rzp = new Razorpay(options);
-          rzp.open();
-        } catch (error) {
-          alert("Error: " + error.message);
-        }
-      });
+            const orderData = await response.json();
+            if (orderData.error) {
+              alert("Error: " + orderData.error);
+              return;
+            }
+
+            const options = {
+              key: "{{ razorpay_key_id }}",
+              amount: orderData.amount,
+              currency: orderData.currency,
+              name: "Mona Squad Dandiya Festival",
+              description: "Festival Entry Pass",
+              order_id: orderData.order_id,
+              prefill: { name: orderData.name, contact: orderData.phone },
+              theme: { color: "#4F46E5" },
+              handler: function (response) {
+                const params = new URLSearchParams({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                });
+                window.location.href = "/payment-loader?" + params.toString();
+              },
+            };
+            const rzp = new Razorpay(options);
+            rzp.open();
+          } catch (error) {
+            alert("Error: " + error.message);
+          }
+        });
     </script>
   </body>
 </html>
