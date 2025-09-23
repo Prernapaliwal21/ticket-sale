@@ -65,6 +65,26 @@
         -ms-overflow-style: none;
         scrollbar-width: none;
       }
+
+      .marquee-container {
+        overflow: hidden;
+        position: relative;
+        white-space: nowrap;
+      }
+
+      .marquee-track {
+        display: inline-flex;
+        animation: scroll-left 15s linear infinite;
+      }
+
+      @keyframes scroll-left {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-50%);
+        }
+      }
     </style>
   </head>
   <body class="text-gray-800 relative font-sans">
@@ -204,6 +224,7 @@
     </div>
 
     <!-- Festival Info Section -->
+  
     <section class="max-w-6xl mx-auto px-4 py-16 relative z-10">
       <div class="rounded-2xl p-8">
         <!-- <h2 class="text-3xl font-bold text-center mb-12 text-white">
@@ -211,11 +232,14 @@
         </h2> -->
 
         <!-- Sponsors Row -->
-     
+
         <div class="mb-16 relative">
+          
           <h3 class="text-2xl font-bold mb-6 text-center text-white">
             🎉 Our Sponsors
           </h3>
+          <div class="marquee-container">
+            <div class="marquee-track">
           <div
             id="sponsorContainer"
             class="flex space-x-6 overflow-x-auto no-scrollbar scroll-smooth px-12"
@@ -262,6 +286,8 @@
               />
               <p class="font-semibold text-white">Shree Radha Raman</p>
               <p class="font-semibold text-white">Exclusive Mens Wear</p>
+            </div>
+            </div>
             </div>
           </div>
 
@@ -312,6 +338,8 @@
           <h3 class="text-2xl font-bold mb-6 text-center text-white">
             🤝 Paid Partners
           </h3>
+          <div class="marquee-container">
+            <div class="marquee-track">
           <div
             id="partnerContainer"
             class="flex space-x-6 overflow-x-auto no-scrollbar scroll-smooth px-12"
@@ -347,6 +375,8 @@
               <p class="font-semibold text-white">D Lensclick</p>
             </div>
           </div>
+            </div>
+          </div>
         </div>
 
         <!-- festival highlights -->
@@ -354,6 +384,8 @@
           <h3 class="text-2xl font-bold mb-6 text-center text-white">
             🎬 Festival Highlights (YouTube)
           </h3>
+          <div class="marquee-container">
+            <div class="marquee-track">
           <div
             id="festivalHighlightContainer"
             class="flex space-x-4 sm:space-x-6 overflow-x-auto no-scrollbar scroll-smooth px-4 sm:px-12"
@@ -422,9 +454,13 @@
               </p>
             </a>
           </div>
+          </div>
+          </div>
         </div>
       </div>
     </section>
+   
+
 
     <!-- Contact Popup -->
     <div
@@ -525,6 +561,34 @@
         document.getElementById(id).scrollBy({ left: 300, behavior: "smooth" });
       }
 
+      function continuousScroll(id, speed = 1) {
+        const container = document.getElementById(id);
+
+        if (!container.dataset.duplicated) {
+          container.innerHTML += container.innerHTML; // duplicate content for seamless loop
+          container.dataset.duplicated = "true";
+        }
+
+        let scrollPos = 0;
+
+        function scrollStep() {
+          scrollPos += speed;
+          if (scrollPos >= container.scrollWidth / 2) {
+            scrollPos = 0; // reset back to start (half width bcoz duplicate)
+          }
+          container.scrollLeft = scrollPos;
+          requestAnimationFrame(scrollStep);
+        }
+
+        scrollStep();
+      }
+
+      // call on load
+      window.onload = () => {
+        continuousScroll("sponsorContainer", 0.5); // sponsor logos
+        continuousScroll("partnerContainer", 0.7); // partners
+        continuousScroll("festivalHighlightContainer", 1); // highlights
+      };
       // Booking Form
       document
         .getElementById("bookingForm")
