@@ -348,6 +348,12 @@ def admin_scanner():
 def scanner():
     return render_template("scanner.html")
 
+@app.route("/gallery")
+def gallery():
+    return render_template("gallery.html")
+
+
+
 @app.route("/health")
 def health_check():
     return "OK", 200

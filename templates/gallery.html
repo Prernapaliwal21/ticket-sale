@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mona Squad Festival Gallery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-900 text-white font-sans">
+    <header class="p-6 text-center">
+      <h1 class="text-3xl font-bold mb-2">📸 Festival Gallery</h1>
+      <a href="/" class="text-blue-400 underline">← Back to Home</a>
+    </header>
+
+    <main
+      class="max-w-6xl mx-auto p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"
+    >
+      <img
+        src="/static/images/gallery/gallery-1.png"
+        alt="Gallery 1"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-2.png"
+        alt="Gallery 2"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-3.png"
+        alt="Gallery 3"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-4.png"
+        alt="Gallery 4"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-5.png"
+        alt="Gallery 5"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-6.png"
+        alt="Gallery 5"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-7.png"
+        alt="Gallery 5"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-8.png"
+        alt="Gallery 5"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-9.png"
+        alt="Gallery 5"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-10.png"
+        alt="Gallery 5"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-11.png"
+        alt="Gallery 5"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-12.png"
+        alt="Gallery 5"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-13.png"
+        alt="Gallery 5"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-14.png"
+        alt="Gallery 5"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-15.png"
+        alt="Gallery 5"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-16.png"
+        alt="Gallery 5"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+      <img
+        src="/static/images/gallery/gallery-17.png"
+        alt="Gallery 5"
+        class="rounded-lg shadow-lg hover:scale-105 transition cursor-pointer"
+           onclick="openModal(this.src)"
+      />
+    </main>
+
+    <!-- Modal (hidden by default) -->
+    <div
+      id="imageModal"
+      class="fixed inset-0 bg-black/90 hidden items-center justify-center z-50"
+    >
+      <!-- Close button -->
+      <span
+        class="absolute top-5 right-8 text-4xl cursor-pointer text-white"
+        onclick="closeModal()"
+        >&times;</span
+      >
+      <!-- Zoomed image -->
+      <img
+        id="modalImage"
+        src=""
+        class="max-h-[90%] max-w-[90%] rounded-lg shadow-xl"
+      />
+    </div>
+
+    <script>
+        function openModal(src) {
+          document.getElementById("modalImage").src = src;
+          document.getElementById("imageModal").classList.remove("hidden");
+          document.getElementById("imageModal").classList.add("flex");
+        }
+        function closeModal() {
+          document.getElementById("imageModal").classList.add("hidden");
+          document.getElementById("imageModal").classList.remove("flex");
+        }
+      </script>
+  </body>
+</html>
