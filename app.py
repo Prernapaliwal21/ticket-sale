@@ -321,10 +321,10 @@ def admin_login():
     else:
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
-@app.route("/admin/logins")
-def admin_logins():
-    logs = list(logins_collection.find({}, {"_id": 0}))
-    return jsonify(logs)
+# @app.route("/admin/logins")
+# def admin_logins():
+#     logs = list(logins_collection.find({}, {"_id": 0}))
+#     return jsonify(logs)
 
 @app.route("/admin/stats")
 def admin_stats():
@@ -344,9 +344,9 @@ def admin_stats():
 def admin_scanner():
     return render_template("admin_scanner.html")
 
-@app.route("/scanner")
-def scanner():
-    return render_template("scanner.html")
+# @app.route("/scanner")
+# def scanner():
+#     return render_template("scanner.html")
 
 @app.route("/gallery")
 def gallery():
