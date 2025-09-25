@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 // Cron job running every 5 minutes
 cron.schedule('*/5 * * * *', () => {
     console.log('Running health check...');
-    axios.get('https://ticket-sale-2.onrender.com/health')
+    axios.get('https://registration-sale-2.onrender.com/health')
         .then(response => {
             console.log('Health check success:', response.status);
         })

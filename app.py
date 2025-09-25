@@ -29,7 +29,7 @@ razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 mongo_client = MongoClient(os.getenv("MONGO_URL"), tls=True, tlsAllowInvalidCertificates=False)
 db = mongo_client["festival_booking"]
 logins_collection = db["logins"]
-tickets_collection = db["tickets"]
+tickets_collection = db["registrations"]
 users_collection = db["users"]
 
 TICKET_PRICE_INR = 200
@@ -43,7 +43,7 @@ def generate_qr_token():
 
 def create_qr_code(ticket_data):
     qr_data = {
-        "ticket_id": ticket_data["ticket_id"],
+        "registration_id": ticket_data["registration_id"],
         "qr_token": ticket_data["qr_token"],
         "name": ticket_data["name"],
         "event": "Mona Squad Dandiya Festival 2025",
@@ -65,20 +65,20 @@ def generate_pdf_tickets(tickets_data):
     styles = getSampleStyleSheet()
     story = []
 
-    title = Paragraph("<b>Mona Squad Dandiya Festival 2025 - Entry Tickets</b>", styles["Title"])
+    title = Paragraph("<b>Mona Squad Dandiya Festival 2025 - Entry Registrations</b>", styles["Title"])
     story.append(title)
     story.append(Spacer(1, 20))
 
-    for i, ticket in enumerate(tickets_data, 1):
-        ticket_header = Paragraph(f"<b>Ticket #{i} - ID: {ticket['ticket_id']}</b>", styles["Heading2"])
+    for i, registration in enumerate(tickets_data, 1):
+        ticket_header = Paragraph(f"<b>Registration #{i} - ID: {registration['registration_id']}</b>", styles["Heading2"])
         story.append(ticket_header)
         story.append(Spacer(1, 10))
 
         details = f"""
 <b>Event:</b> Mona Squad Dandiya Festival 2025<br/>
-<b>Name:</b> {ticket["name"]}<br/>
-<b>Phone:</b> {ticket["phone"]}<br/>
-<b>Price:</b> Rs.{ticket["price_per_ticket"]}<br/>
+<b>Name:</b> {registration["name"]}<br/>
+<b>Phone:</b> {registration["phone"]}<br/>
+<b>Price:</b> Rs.{registration["price_per_ticket"]}<br/>
 <b>Generated:</b> {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}<br/>
 <b>Valid:</b> Single Entry Only<br/>
 """
@@ -86,7 +86,7 @@ def generate_pdf_tickets(tickets_data):
         story.append(details_para)
         story.append(Spacer(1, 15))
 
-        qr_img_data = base64.b64decode(ticket["qr_code"])
+        qr_img_data = base64.b64decode(registration["qr_code"])
         qr_img_buffer = BytesIO(qr_img_data)
         qr_image = Image(qr_img_buffer, width=200, height=200)
 
@@ -153,23 +153,23 @@ def success():
     payment_id = request.args.get("payment_id")
     order_id = request.args.get("order_id")
 
-    tickets = list(tickets_collection.find({"payment_id": payment_id}, {"_id": 0}))
-    if not tickets:
-        return "Invalid payment or tickets not found", 400
+    registrations = list(tickets_collection.find({"payment_id": payment_id}, {"_id": 0}))
+    if not registrations:
+        return "Invalid payment or registrations not found", 400
     
 
-    total_amount = (TICKET_PRICE_INR * len(tickets) * GST_RATE )/ 100 + (TICKET_PRICE_INR * len(tickets))
+    total_amount = (TICKET_PRICE_INR * len(registrations) * GST_RATE )/ 100 + (TICKET_PRICE_INR * len(registrations))
     total_amount = round(total_amount, 2)
-    base_amount = TICKET_PRICE_INR * len(tickets)
+    base_amount = TICKET_PRICE_INR * len(registrations)
     gst_amount = round(total_amount - base_amount, 2)
 
     print(total_amount, base_amount, gst_amount)
     return render_template(
         "success.html",
-        tickets=tickets,
+        registrations=registrations,
         payment_id=payment_id,
         order_id=order_id,
-        quantity=len(tickets),
+        quantity=len(registrations),
         base_amount=base_amount,
         price=TICKET_PRICE_INR,
         total=total_amount,
@@ -209,13 +209,13 @@ def verify_payment():
     gst_per_ticket = round(TICKET_PRICE_INR * (GST_RATE / 100), 2)
     price_per_ticket = round(TICKET_PRICE_INR + gst_per_ticket, 2)
 
-    tickets = []
+    registrations = []
     for i in range(quantity):
-        ticket_id = f"MONA-{datetime.now().strftime('%Y%m%d')}-{random.randint(10000, 99999)}-{i + 1:02d}"
+        registration_id = f"MONA-{datetime.now().strftime('%Y%m%d')}-{random.randint(10000, 99999)}-{i + 1:02d}"
         qr_token = generate_qr_token()
 
         ticket_data = {
-            "ticket_id": ticket_id,
+            "registration_id": registration_id,
             "qr_token": qr_token,
             "name": name,
             "phone": phone,
@@ -226,16 +226,16 @@ def verify_payment():
             "is_scanned": False,
         }
         ticket_data["qr_code"] = create_qr_code(ticket_data)
-        tickets.append(ticket_data)
+        registrations.append(ticket_data)
 
-    tickets_collection.insert_many(tickets)
-    for t in tickets:
+    tickets_collection.insert_many(registrations)
+    for t in registrations:
         if "_id" in t:
             t["_id"] = str(t["_id"])  # or just delete: del t["_id"]
 
     redirect_url = f"/success?payment_id={razorpay_payment_id}&order_id={razorpay_order_id}"
 
-    return jsonify({"success": True, "tickets": tickets, "redirect_url": redirect_url})
+    return jsonify({"success": True, "registrations": registrations, "redirect_url": redirect_url})
 
 @app.route("/admin/validate-qr", methods=["POST"])
 def admin_validate_qr():
@@ -256,6 +256,7 @@ def admin_validate_qr():
         return jsonify({"valid": False, "message": "QR token missing"})
 
     ticket_found = tickets_collection.find_one({"qr_token": decoded_qr["qr_token"]}, {"_id": 0})
+    print("ticket",ticket_found)
     if not ticket_found:
         return jsonify({"valid": False, "message": "Invalid QR - Not Found"})
 
@@ -263,20 +264,20 @@ def admin_validate_qr():
         return jsonify({
             "valid": False,
             "message": "DUPLICATE - Already scanned",
-            "ticket_id": ticket_found["ticket_id"],
+            "registration_id": ticket_found["registration_id"],
             "holder_name": ticket_found["name"],
         })
 
     tickets_collection.update_one(
-        {"ticket_id": ticket_found["ticket_id"]},
+        {"registration_id": ticket_found["registration_id"]},
         {"$set": {"is_scanned": True, "scanned_at": datetime.now().isoformat()}}
     )
 
     return jsonify({
         "valid": True,
         "message": "ENTRY APPROVED",
-        "ticket_details": {
-            "ticket_id": ticket_found["ticket_id"],
+        "participant_details": {
+            "registration_id": ticket_found["registration_id"],
             "name": ticket_found["name"],
             "phone": ticket_found["phone"],
             "price_paid": f"Rs.{ticket_found['price_per_ticket']}",
@@ -286,11 +287,11 @@ def admin_validate_qr():
 
 @app.route('/download-pdf/<payment_id>')
 def download_pdf(payment_id):
-    tickets = list(tickets_collection.find({"payment_id": payment_id}, {"_id": 0}))
-    if not tickets:
-        return "No tickets found", 404
+    registrations = list(tickets_collection.find({"payment_id": payment_id}, {"_id": 0}))
+    if not registrations:
+        return "No registrations found", 404
 
-    html_content = render_template("tickets_pdf.html", tickets=tickets)
+    html_content = render_template("tickets_pdf.html", registrations=registrations)
     pdf = HTML(string=html_content, base_url=request.host_url).write_pdf()
 
     response = make_response(pdf)
@@ -329,13 +330,13 @@ def admin_login():
 @app.route("/admin/stats")
 def admin_stats():
     total_tickets = tickets_collection.count_documents({})
-    tickets_scanned = tickets_collection.count_documents({"is_scanned": True})
-    pending_entries = total_tickets - tickets_scanned
-    total_revenue = sum(ticket.get("price_per_ticket", 0) for ticket in tickets_collection.find({}))
+    participants_checked_in = tickets_collection.count_documents({"is_scanned": True})
+    pending_entries = total_tickets - participants_checked_in
+    total_revenue = sum(registration.get("price_per_ticket", 0) for registration in tickets_collection.find({}))
 
     return jsonify({
-        "total_tickets_sold": total_tickets,
-        "tickets_scanned": tickets_scanned,
+        "total_registrations": total_tickets,
+        "participants_checked_in": participants_checked_in,
         "pending_entries": pending_entries,
         "total_revenue": round(total_revenue, 2),
     })

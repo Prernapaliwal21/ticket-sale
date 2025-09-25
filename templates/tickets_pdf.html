@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>Mona Squad Ticket</title>
+<title>Mona Squad Registration</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
   @page { size: A4; margin: 20px; }
@@ -21,7 +21,7 @@
     --shadow-dark: rgba(35, 7, 13, 0.6);
   }
 
-  .ticket {
+  .registration {
     display: flex;
     justify-content: space-between;
     width: 100%;
@@ -62,7 +62,7 @@
   .instructions ul { list-style: disc; padding-left: 20px; margin: 4px 0 0 0; }
 
   @media (max-width: 768px) {
-    .ticket { flex-direction: column; }
+    .registration { flex-direction: column; }
     .left-section { padding-right: 0; }
     .right-section { width: 100%; margin-top: 16px; }
     .title-section { margin-left: 0; text-align: center; margin-top: 8px; }
@@ -73,8 +73,8 @@
 </style>
 </head>
 <body>
-  {% for ticket in tickets %}
-  <div class="ticket">
+  {% for registration in registrations %}
+  <div class="registration">
     <!-- Left: Details -->
     <div class="left-section">
       <div class="header">
@@ -92,15 +92,15 @@
         <div><span class="label">Venue:</span> VISHWAS SWAROOPAM GARDEN, NATHDWARA</div>
       </div>
       <div class="meta">
-        <div class="holder">Holder: {{ ticket.name }}</div>
-        <div class="price">Price: ₹{{ "%.2f"|format(ticket.price_per_ticket) }}</div>
+        <div class="holder">Holder: {{ registration.name }}</div>
+        <div class="price">Price: ₹{{ "%.2f"|format(registration.price_per_ticket) }}</div>
       </div>
       <div class="instructions">
         <p><strong>Entry Instructions:</strong></p>
         <ul>
           <li>Present this QR code at venue entrance</li>
           <li>Gate will open after 7 PM</li>
-          <li>Each ticket valid for single entry only</li>
+          <li>Each registration valid for single entry only</li>
           <li>Screenshot or printed copy accepted</li>
         </ul>
       </div>
@@ -109,7 +109,7 @@
     <!-- Right: QR -->
     <div class="right-section">
       <div class="qr-wrap">
-        <img src="data:image/png;base64,{{ ticket.qr_code }}" alt="QR" />
+        <img src="data:image/png;base64,{{ registration.qr_code }}" alt="QR" />
       </div>
       <div class="gate">Gate No. 2</div>
       <div class="entry">Single Entry</div>

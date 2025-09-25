@@ -68,8 +68,8 @@
         --shadow-dark: rgba(35, 7, 13, 0.6);
       }
 
-      /* BookMyShow Style Ticket Card */
-      .ticket-card {
+      /* BookMyShow Style Registration Card */
+      .registration-card {
         background: linear-gradient(
           135deg,
           var(--warm) 0%,
@@ -86,11 +86,11 @@
 
       /* Removed perforated edge effect */
 
-      .ticket-body {
+      .registration-body {
         display: flex;
         min-height: 160px;
       }
-      .ticket {
+      .registration {
         position: relative;
         width: 100%;
         max-width: 900px;
@@ -111,7 +111,7 @@
         margin: 0 auto;
       }
 
-      .ticket-left {
+      .registration-left {
         flex: 1;
         padding: 20px;
         color: var(--offwhite);
@@ -122,7 +122,7 @@
         padding-right: 140px;
       }
 
-      .ticket-right {
+      .registration-right {
         width: 120px;
         background: transparent;
         display: flex;
@@ -134,7 +134,7 @@
         position: relative;
       }
 
-    /* Ticket Header */
+    /* Registration Header */
     .header-row {
         display: flex;
         flex-direction: row;
@@ -209,7 +209,7 @@
         font-weight: 500;
       }
 
-      .ticket-meta {
+      .registration-meta {
         font-size: 11px;
         margin-top: auto;
       }
@@ -219,7 +219,7 @@
         margin-bottom: 2px;
       }
 
-      .ticket-price {
+      .registration-price {
         font-weight: 700;
         color: var(--gold);
       }
@@ -262,26 +262,26 @@
 
       /* Mobile optimizations */
       @media (max-width: 640px) {
-        .ticket-card {
+        .registration-card {
           margin: 12px 16px;
           border-radius: 12px;
         }
 
-        .ticket-body {
+        .registration-body {
           min-height: 140px;
         }
 
-        .ticket-left {
+        .registration-left {
           padding: 16px;
           padding-right: 120px;
         }
 
-        .ticket-right {
+        .registration-right {
           width: 100px;
           padding: 12px;
         }
 
-        .ticket-card::before {
+        .registration-card::before {
           display: none;
         }
 
@@ -331,25 +331,25 @@
 
       /* Large screen adjustments */
       @media (min-width: 768px) {
-        .ticket-card {
+        .registration-card {
           max-width: 600px;
         }
 
-        .ticket-body {
+        .registration-body {
           min-height: 180px;
         }
 
-        .ticket-left {
+        .registration-left {
           padding: 24px;
           padding-right: 160px;
         }
 
-        .ticket-right {
+        .registration-right {
           width: 140px;
           padding: 20px;
         }
 
-        .ticket-card::before {
+        .registration-card::before {
           display: none;
         }
 
@@ -523,7 +523,7 @@
           Payment Successful!
         </h1>
         <p class="text-gray-600 mb-4">
-          Your {{ quantity }} ticket(s) have been generated successfully.
+          Your {{ quantity }} registration(s) have been generated successfully.
         </p>
 
         <!-- Payment Summary -->
@@ -538,7 +538,7 @@
               <p class="font-mono text-xs">{{ order_id }}</p>
             </div>
             <div>
-              <span class="text-gray-600">Total Tickets:</span>
+              <span class="text-gray-600">Total Registrations:</span>
               <p class="font-semibold">{{ quantity }}</p>
             </div>
             <div>
@@ -574,7 +574,7 @@
                 d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>
-            Download PDF Tickets
+            Download PDF Registrations
           </a>
           <button onclick="window.print()" class="btn btn-secondary">
             <svg
@@ -590,22 +590,22 @@
                 d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
               />
             </svg>
-            Print Tickets
+            Print Registrations
           </button>
         </div>
       </div>
 
-      <!-- Ticket Section -->
+      <!-- Registration Section -->
       <div class="printable">
         <h2 class="text-2xl font-bold text-center mb-6">
-          Your Festival Entry Tickets
+          Your Festival Entry Registrations
         </h2>
 
-        <!-- Tickets Loop -->
+        <!-- Registrations Loop -->
         <div class="space-y-6">
-          {% for ticket in tickets %}
-          <div class="ticket">
-            <!-- Ticket Header -->
+          {% for registration in registrations %}
+          <div class="registration">
+            <!-- Registration Header -->
             <!-- <div class="p-4 text-center border-b border-dashed border-white/40">
               <div class="logo">
                 <img
@@ -630,7 +630,7 @@
               </div>
             </div>
 
-            <!-- Ticket Body -->
+            <!-- Registration Body -->
             <div class="p-4 flex justify-between items-start gap-3">
               <div class="flex-1 space-y-1 text-sm">
                 <p><span class="font-semibold">Date:</span> 5TH OCT 2025</p>
@@ -640,10 +640,10 @@
                   GARDEN, NATHDWARA
                 </p>
                 <p class="pt-2">
-                  <span class="font-semibold">Holder:</span> {{ ticket.name }}
+                  <span class="font-semibold">Holder:</span> {{ registration.name }}
                 </p>
                 <p class="font-bold text-yellow-300">
-                  ₹{{ "%.2f"|format(ticket.price_per_ticket) }}
+                  ₹{{ "%.2f"|format(registration.price_per_ticket) }}
                 </p>
               </div>
 
@@ -651,7 +651,7 @@
               <div class="flex flex-col items-center">
                 <div class="bg-white p-2 rounded-lg shadow">
                   <img
-                    src="data:image/png;base64,{{ ticket.qr_code }}"
+                    src="data:image/png;base64,{{ registration.qr_code }}"
                     alt="QR Code"
                     class="w-20 h-20 object-contain"
                   />
@@ -661,7 +661,7 @@
               </div>
             </div>
 
-            <!-- Ticket Footer -->
+            <!-- Registration Footer -->
             <div
               class="bg-white/10 p-3 text-xs leading-relaxed border-t border-dashed border-white/40"
             >
@@ -671,7 +671,7 @@
               <ul class="list-disc list-inside space-y-1">
                 <li>Present this QR code at venue entrance</li>
                 <li>Gate will open after 7 PM</li>
-                <li>Each ticket valid for single entry only</li>
+                <li>Each registration valid for single entry only</li>
                 <li>Screenshot or printed copy accepted</li>
               </ul>
             </div>

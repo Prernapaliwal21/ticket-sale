@@ -53,12 +53,18 @@
       </div>
 
       <!-- QR Reader -->
-      <div class="max-w-md mx-auto mb-6">
+      <div class="max-w-md mx-auto mb-6 relative">
         <div
           id="qr-reader"
           class="border-4 border-gray-600 rounded-lg overflow-hidden bg-black min-h-[300px] flex items-center justify-center"
         >
           <p class="text-gray-500">Camera will appear here</p>
+        </div>
+        <!-- Overlay like Google Pay -->
+        <div
+          class="absolute inset-0 flex items-center justify-center pointer-events-none"
+        >
+          <div class="border-4 border-green-400 rounded-lg w-3/4 h-3/4"></div>
         </div>
       </div>
 
@@ -100,13 +106,10 @@
       // Load available cameras
       async function loadCameras() {
         try {
-          // Request camera permissions first
           await navigator.mediaDevices.getUserMedia({ video: true });
-
           cameras = await Html5Qrcode.getCameras();
           const cameraSelect = document.getElementById("camera-select");
           cameraSelect.innerHTML = "";
-
           if (cameras && cameras.length > 0) {
             cameras.forEach((camera, index) => {
               const option = document.createElement("option");
@@ -114,7 +117,7 @@
               option.text = camera.label || `Camera ${index + 1}`;
               cameraSelect.appendChild(option);
             });
-            selectedCameraId = cameras[cameras.length - 1].id; // Prefer back camera
+            selectedCameraId = cameras[cameras.length - 1].id;
             cameraSelect.value = selectedCameraId;
             debug(`Found ${cameras.length} cameras`);
           } else {
@@ -133,47 +136,28 @@
       async function startScanner() {
         try {
           selectedCameraId = document.getElementById("camera-select").value;
-
           if (!selectedCameraId) {
             alert("No camera selected");
             return;
           }
 
           const config = {
-            fps: 15, // thoda fast
-            qrbox: function (viewfinderWidth, viewfinderHeight) {
-              // Responsive qrbox size (square in center)
-              let minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-              let boxSize = minEdge * 0.7; // 70% of screen size
-              return { width: boxSize, height: boxSize };
-            },
-            aspectRatio: 1.0,
+            fps: 15,
+            qrbox: false, // ✅ Full-frame scanning
+            aspectRatio: 1.777, // widescreen (mobile friendly)
             disableFlip: false,
             experimentalFeatures: {
-              useBarCodeDetectorIfSupported: true, // Better accuracy
+              useBarCodeDetectorIfSupported: true,
             },
           };
 
           html5QrcodeScanner = new Html5Qrcode("qr-reader");
-
           await html5QrcodeScanner.start(
             { deviceId: { exact: selectedCameraId } },
             config,
             onScanSuccess,
             onScanFailure
           );
-
-          // ✅ Enable camera zoom & torch (if supported)
-          html5QrcodeScanner.getRunningTrackSettings().then((settings) => {
-            if (settings.zoom) {
-              debug("Zoom supported, adding slider");
-              addZoomControl(settings);
-            }
-            if (settings.torch) {
-              debug("Torch supported, adding toggle");
-              addTorchControl();
-            }
-          });
 
           document.getElementById("start-scanner").disabled = true;
           document.getElementById("stop-scanner").disabled = false;
@@ -188,54 +172,12 @@
         }
       }
 
-      // 🔍 Zoom control
-      function addZoomControl(settings) {
-        let resultsDiv = document.getElementById("scan-results");
-        let zoomContainer = document.createElement("div");
-        zoomContainer.className = "bg-gray-800 p-3 rounded-lg mt-4";
-        zoomContainer.innerHTML = `
-        <label class="block mb-2 text-sm">Zoom:</label>
-        <input type="range" id="zoom-slider" min="${settings.zoom.min}" max="${settings.zoom.max}" step="1" value="${settings.zoom.min}" class="w-full">
-    `;
-        resultsDiv.appendChild(zoomContainer);
-
-        document
-          .getElementById("zoom-slider")
-          .addEventListener("input", async (e) => {
-            await html5QrcodeScanner.applyVideoConstraints({
-              advanced: [{ zoom: e.target.value }],
-            });
-            debug("Zoom set to " + e.target.value);
-          });
-      }
-
-      // 🔦 Torch control
-      function addTorchControl() {
-        let resultsDiv = document.getElementById("scan-results");
-        let torchBtn = document.createElement("button");
-        torchBtn.className =
-          "bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg mt-3";
-        torchBtn.textContent = "Toggle Torch";
-
-        let torchOn = false;
-        torchBtn.onclick = async () => {
-          torchOn = !torchOn;
-          await html5QrcodeScanner.applyVideoConstraints({
-            advanced: [{ torch: torchOn }],
-          });
-          debug("Torch " + (torchOn ? "ON" : "OFF"));
-        };
-
-        resultsDiv.appendChild(torchBtn);
-      }
-
       async function stopScanner() {
         try {
           if (html5QrcodeScanner) {
             await html5QrcodeScanner.stop();
             html5QrcodeScanner = null;
           }
-
           document.getElementById("start-scanner").disabled = false;
           document.getElementById("stop-scanner").disabled = true;
           document.getElementById("scanner-status").innerHTML =
@@ -249,106 +191,68 @@
       function onScanSuccess(decodedText, decodedResult) {
         debug("QR Code scanned: " + decodedText.substring(0, 50) + "...");
         displayScanResult(decodedText);
-
-        // Optional: Stop scanner after successful scan
-        // stopScanner();
       }
 
       function onScanFailure(error) {
-        // Handle scan failure silently, but log for debugging
-        // debug('Scan attempt failed: ' + error);
+        // silent errors
       }
 
       function displayScanResult(qrData) {
         const resultsDiv = document.getElementById("scan-results");
-
         try {
           const ticketData = JSON.parse(qrData);
-
           const resultCard = document.createElement("div");
           resultCard.className =
             "bg-green-800 p-4 rounded-lg mb-4 animate-pulse";
-
           resultCard.innerHTML = `
-                    <div class="text-center mb-4">
-                        <div class="text-2xl mb-2">✅</div>
-                        <div class="font-bold text-lg text-green-300">Valid Ticket Scanned!</div>
-                    </div>
-                    <div class="bg-black/20 rounded p-3">
-                        <div class="grid grid-cols-1 gap-2 text-sm">
-                            <div><strong>Event:</strong> ${
-                              ticketData.event || "Mona Squad Dandiya Festival"
-                            }</div>
-                            <div><strong>Ticket ID:</strong> ${
-                              ticketData.ticket_id || "N/A"
-                            }</div>
-                            <div><strong>Holder:</strong> ${
-                              ticketData.name || "N/A"
-                            }</div>
-                            <div><strong>QR Token:</strong> ${
-                              ticketData.qr_token || "N/A"
-                            }</div>
-                            <div><strong>Scanned At:</strong> ${new Date().toLocaleString()}</div>
-                        </div>
-                    </div>
-                    <div class="text-center mt-4">
-                        <div class="text-yellow-300 text-sm">
-                            ⚠️ This is a public scanner. For entry validation, please use the admin scanner.
-                        </div>
-                    </div>
-                `;
-
+            <div class="text-center mb-4">
+              <div class="text-2xl mb-2">✅</div>
+              <div class="font-bold text-lg text-green-300">Valid Registration Scanned!</div>
+            </div>
+            <div class="bg-black/20 rounded p-3">
+              <div class="grid grid-cols-1 gap-2 text-sm">
+                <div><strong>Event:</strong> ${
+                  ticketData.event || "Mona Squad Dandiya Festival"
+                }</div>
+                <div><strong>Registration ID:</strong> ${
+                  ticketData.registration_id || "N/A"
+                }</div>
+                <div><strong>Holder:</strong> ${
+                  ticketData.name || "N/A"
+                }</div>
+                <div><strong>QR Token:</strong> ${
+                  ticketData.qr_token || "N/A"
+                }</div>
+                <div><strong>Scanned At:</strong> ${new Date().toLocaleString()}</div>
+              </div>
+            </div>`;
           resultsDiv.innerHTML = "";
           resultsDiv.appendChild(resultCard);
-
-          // Play success sound (if supported)
-          try {
-            const audio = new Audio(
-              "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMcBzqU2+/EbCEELIHO8tmJOQcZabjr5Z9NEAxPr+vemicIDWvA0+eWMHIDKYHM5K4DWcKvYxwHOU7RjdcjERh2yxuHISIFKILI8tCKNwgZY7nm1n0wCiHU/paqFmEJ6Ep0nVRADnSLvWBGWhHjAgEoQj5MQrNgNjVhstDdr2QaCjG4FeU9jbHQr2gRJILIr9ckJQoqiLjhS7qFaGZZnT5WY3IeGQYJ4w6CHXICGLGaxgEXZhkpxEDPCx4aJF1HpUIcCAkYiIL/JjoNGNjQ1mNUGiI0xg=="
-            );
-            audio.volume = 0.3;
-            audio.play();
-          } catch (e) {}
         } catch (error) {
           const resultCard = document.createElement("div");
           resultCard.className = "bg-blue-800 p-4 rounded-lg mb-4";
-
           resultCard.innerHTML = `
-                    <div class="text-center">
-                        <div class="text-2xl mb-2">📄</div>
-                        <div class="font-bold text-lg">Raw QR Code Data</div>
-                        <div class="bg-black/20 rounded p-3 mt-3">
-                            <div class="text-sm font-mono break-all">${qrData}</div>
-                        </div>
-                        <div class="text-sm text-gray-300 mt-2">
-                            Scanned at: ${new Date().toLocaleString()}
-                        </div>
-                    </div>
-                `;
-
+            <div class="text-center">
+              <div class="text-2xl mb-2">📄</div>
+              <div class="font-bold text-lg">Raw QR Code Data</div>
+              <div class="bg-black/20 rounded p-3 mt-3">
+                <div class="text-sm font-mono break-all">${qrData}</div>
+              </div>
+              <div class="text-sm text-gray-300 mt-2">
+                Scanned at: ${new Date().toLocaleString()}
+              </div>
+            </div>`;
           resultsDiv.innerHTML = "";
           resultsDiv.appendChild(resultCard);
         }
-
-        // Auto-hide after 15 seconds
-        setTimeout(() => {
-          const cards = resultsDiv.querySelectorAll(
-            ".bg-green-800, .bg-blue-800"
-          );
-          if (cards.length > 0) {
-            resultsDiv.innerHTML = "";
-          }
-        }, 15000);
       }
 
-      // Event listeners
       document
         .getElementById("start-scanner")
         .addEventListener("click", startScanner);
       document
         .getElementById("stop-scanner")
         .addEventListener("click", stopScanner);
-
       document
         .getElementById("camera-select")
         .addEventListener("change", function () {
@@ -356,13 +260,11 @@
           debug("Camera changed to: " + this.options[this.selectedIndex].text);
         });
 
-      // Initialize
       window.addEventListener("load", () => {
         debug("Page loaded, initializing...");
         loadCameras();
       });
 
-      // Handle page visibility changes
       document.addEventListener("visibilitychange", function () {
         if (document.hidden && html5QrcodeScanner) {
           debug("Page hidden, stopping scanner");

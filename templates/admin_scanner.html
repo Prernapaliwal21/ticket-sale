@@ -81,19 +81,19 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div class="bg-blue-800 rounded-lg p-4 text-center">
             <div class="text-2xl font-bold" id="totalTickets">0</div>
-            <div class="text-sm text-blue-200">Total Sold</div>
+            <div class="text-sm text-blue-200">Total Registrations</div>
           </div>
           <div class="bg-green-800 rounded-lg p-4 text-center">
             <div class="text-2xl font-bold" id="scannedTickets">0</div>
-            <div class="text-sm text-green-200">Entries Approved</div>
+            <div class="text-sm text-green-200">Participants Checked-In</div>
           </div>
           <div class="bg-yellow-800 rounded-lg p-4 text-center">
             <div class="text-2xl font-bold" id="pendingTickets">0</div>
-            <div class="text-sm text-yellow-200">Pending Entries</div>
+            <div class="text-sm text-yellow-200">Pending Check-Ins</div>
           </div>
           <div class="bg-purple-800 rounded-lg p-4 text-center">
             <div class="text-2xl font-bold" id="totalRevenue">Rs.0</div>
-            <div class="text-sm text-purple-200">Total Revenue</div>
+            <div class="text-sm text-purple-200">Total Registration Fees</div>
           </div>
         </div>
 
@@ -235,9 +235,9 @@
         const stats = await response.json();
 
         document.getElementById("totalTickets").textContent =
-          stats.total_tickets_sold;
+          stats.total_registrations;
         document.getElementById("scannedTickets").textContent =
-          stats.tickets_scanned;
+          stats.participants_checked_in;
         document.getElementById("pendingTickets").textContent =
           stats.pending_entries;
         document.getElementById("totalRevenue").textContent =
@@ -352,16 +352,16 @@
     <div class="text-sm mb-2">${result.message}</div>
   `;
 
-        if (isValid && result.ticket_details) {
+        if (isValid && result.participant_details) {
           content += `
       <div class="bg-black/20 rounded p-3 mt-3">
         <div class="grid grid-cols-2 gap-2 text-xs">
-          <div><strong>Name:</strong> ${result.ticket_details.name}</div>
-          <div><strong>Ticket ID:</strong> ${result.ticket_details.ticket_id}</div>
-          <div><strong>Email:</strong> ${result.ticket_details.email}</div>
-          <div><strong>Phone:</strong> ${result.ticket_details.phone}</div>
-          <div><strong>Price:</strong> ${result.ticket_details.price_paid}</div>
-          <div><strong>Entry Time:</strong> ${result.ticket_details.entry_time}</div>
+          <div><strong>Name:</strong> ${result.participant_details.name}</div>
+          <div><strong>Registration ID:</strong> ${result.participant_details.registration_id}</div>
+          <div><strong>Email:</strong> ${result.participant_details.email}</div>
+          <div><strong>Phone:</strong> ${result.participant_details.phone}</div>
+          <div><strong>Price:</strong> ${result.participant_details.price_paid}</div>
+          <div><strong>Entry Time:</strong> ${result.participant_details.entry_time}</div>
         </div>
       </div>
     `;
@@ -390,7 +390,7 @@
             <div><span class="font-bold">${
               result.valid ? "APPROVED" : "DENIED"
             }</span> - ${
-          result.ticket_details ? result.ticket_details.name : ""
+          result.participant_details ? result.participant_details.name : ""
         }</div>
             <div class="text-xs opacity-70">${timestamp}</div>
           </div>
