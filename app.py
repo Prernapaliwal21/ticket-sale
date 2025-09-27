@@ -483,26 +483,26 @@ def admin_login():
 #     logs = list(logins_collection.find({}, {"_id": 0}))
 #     return jsonify(logs)
 
-
 @app.route("/admin/stats")
 def admin_stats():
     total_tickets = tickets_collection.count_documents({})
     participants_checked_in = tickets_collection.count_documents({"is_scanned": True})
     pending_entries = total_tickets - participants_checked_in
+
     total_revenue = sum(
-        registration.get("price_per_ticket", 0)
+        float(registration.get("price_per_ticket", 0))
         for registration in tickets_collection.find({})
     )
 
-    return jsonify(
-        {
-            "total_registrations": total_tickets,
-            "participants_checked_in": participants_checked_in,
-            "pending_entries": pending_entries,
-            "total_revenue": round(total_revenue, 2),
-        }
-    )
+    stats = {
+        "total_registrations": total_tickets,
+        "participants_checked_in": participants_checked_in,
+        "pending_entries": pending_entries,
+        "total_revenue": round(total_revenue, 2),
+    }
 
+    print(stats)
+    return jsonify(stats)
 
 @app.route("/admin/scanner")
 def admin_scanner():
