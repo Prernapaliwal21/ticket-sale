@@ -552,12 +552,12 @@
             required
           />
           <select id="quantity" class="border rounded-lg px-3 py-2" required>
-            <option value="1">1 Registration - Rs.200</option>
-            <option value="2">2 Registrations - Rs.400</option>
-            <option value="3">3 Registrations - Rs.600</option>
-            <option value="4">4 Registrations - Rs.800</option>
-            <option value="5">5 Registrations - Rs.1000</option>
-          </select>
+            {% for i in range(1, max_tickets + 1) %}
+                <option value="{{ i }}">
+                    {{ i }} Registration{% if i > 1 %}s{% endif %} - Rs.{{ i * price }}
+                </option>
+            {% endfor %}
+        </select>
           <div class="text-sm text-gray-600 mt-2">
             Each registration includes entry to all festival activities
           </div>

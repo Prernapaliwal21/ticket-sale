@@ -44,8 +44,8 @@ users_collection = db["users"]
 
 # TICKET_PRICE_INR = 200
 TICKET_PRICE_INR = int(os.getenv("TICKET_PRICE_INR", 200))
-MAX_TICKETS = 10
-GST_RATE = 2.36  # 2.36%
+MAX_TICKETS = 5
+GST_RATE = 3  # 3%
 
 admin_sessions = {}
 
