@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mona Squad Dandiya Festival</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script> -->
     <style>
       @keyframes fadeIn {
         from {
@@ -633,51 +633,45 @@
         continuousScroll("festivalHighlightContainer", 1); // highlights
       };
       // Booking Form
-      document
-        .getElementById("bookingForm")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
-          const name = document.getElementById("name").value;
-          const phone = document.getElementById("phone").value;
-          const quantity = parseInt(document.getElementById("quantity").value);
+      document.getElementById("bookingForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+  const quantity = parseInt(document.getElementById("quantity").value);
 
-          try {
-            const response = await fetch("/create-order", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ name, phone, quantity }),
-            });
+  try {
+    const response = await fetch("/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, phone, quantity }),
+    });
 
-            const orderData = await response.json();
-            if (orderData.error) {
-              alert("Error: " + orderData.error);
-              return;
-            }
+    const data = await response.json();
+    if (data.error) {
+      alert("Error: " + data.error);
+      return;
+    }
 
-            const options = {
-              key: "{{ razorpay_key_id }}",
-              amount: orderData.amount,
-              currency: orderData.currency,
-              name: "Mona Squad Event Registration",
-              description: "Participation Fee for Festival",
-              order_id: orderData.order_id,
-              prefill: { name: orderData.name, contact: orderData.phone },
-              theme: { color: "#4F46E5" },
-              handler: function (response) {
-                const params = new URLSearchParams({
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature,
-                });
-                window.location.href = "/payment-loader?" + params.toString();
-              },
-            };
-            const rzp = new Razorpay(options);
-            rzp.open();
-          } catch (error) {
-            alert("Error: " + error.message);
-          }
-        });
+    // Create hidden form for PayU redirect
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = data.payment_url; // backend returns PayU endpoint (test/live)
+
+    for (const key in data.params) {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = key;
+      input.value = data.params[key];
+      form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    form.submit(); // redirect to PayU
+  } catch (error) {
+    alert("Error: " + error.message);
+  }
+});
+
     </script>
   </body>
 </html>
