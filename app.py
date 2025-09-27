@@ -149,6 +149,8 @@ def create_order_payu():
     txnid = str(uuid.uuid4())[:20]
     productinfo = "Mona Squad Dandiya Festival 2025"
 
+   
+
     # ----------------- UDFs -----------------
     udf1 = str(quantity)
     udf2 = udf3 = udf4 = udf5 = ""
@@ -156,9 +158,10 @@ def create_order_payu():
 
     # ----------------- Correct Hash -----------------
     hash_string = (
-        f"{PAYU_MERCHANT_KEY}|{txnid}|{total_amount}|{productinfo}|{name}|{email}|"
+        f"{PAYU_MERCHANT_KEY}|{txnid}|{total_amount:.2f}|{productinfo}|{name}|{email}|"
         f"{udf1}|{udf2}|{udf3}|{udf4}|{udf5}|{udf6}|{udf7}|{udf8}|{udf9}|{udf10}|{PAYU_MERCHANT_SALT}"
     )
+
     hashh = hashlib.sha512(hash_string.encode("utf-8")).hexdigest().lower()
 
     return jsonify(
