@@ -211,7 +211,8 @@
         const data = await response.json();
 
         if (data.success) {
-          localStorage.setItem("adminToken", data.token); // ✅ persists across reload
+          localStorage.setItem("adminToken", data.token);
+          localStorage.setItem("adminRole", data.role); // ✅ role भी save करो
           loadAdminDashboard();
         } else {
           errorDiv.textContent = data.message;
@@ -221,14 +222,22 @@
 
       function loadAdminDashboard() {
         const token = localStorage.getItem("adminToken");
+        const role = localStorage.getItem("adminRole");
+
         if (token) {
           adminToken = token;
           document.getElementById("loginSection").style.display = "none";
           document.getElementById("scannerSection").classList.remove("hidden");
-          refreshStats();
+
+          if (role === "superadmin") {
+            refreshStats(); 
+          } else {
+            document
+              .querySelectorAll(".grid")
+              .forEach((el) => (el.style.display = "none")); 
+          }
         }
       }
-     
 
       async function refreshStats() {
         const response = await fetch("/admin/stats");

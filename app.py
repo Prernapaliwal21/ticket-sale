@@ -242,24 +242,31 @@ def payu_success():
         for i in range(quantity):
             registration_id = f"MONA-{datetime.now().strftime('%Y%m%d')}-{random.randint(10000, 99999)}-{i+1:02d}"
             qr_token = generate_qr_token()
-            ticket_data = {
-                "registration_id": registration_id,
-                "qr_token": qr_token,
-                "name": firstname,
-                "phone": form.get("phone", ""),
-                "price_per_ticket": price_per_ticket,
-                "payment_id": txnid,
-                "order_id": txnid,
-                "created_at": datetime.now().isoformat(),
-                "is_scanned": False,
-            }
-            ticket_data["qr_code"] = create_qr_code(ticket_data)
-            registrations.append(ticket_data)
+            # Prevent duplicate ticket generation
+            if tickets_collection.find_one({"payment_id": txnid}):
+                print("Tickets already generated")
+            else:
+                    
+                ticket_data = {
+                    "registration_id": registration_id,
+                    "qr_token": qr_token,
+                    "name": firstname,
+                    "phone": form.get("phone", ""),
+                    "price_per_ticket": price_per_ticket,
+                    "payment_id": txnid,
+                    "order_id": txnid,
+                    "created_at": datetime.now().isoformat(),
+                    "is_scanned": False,
+                }
+                ticket_data["qr_code"] = create_qr_code(ticket_data)
+                registrations.append(ticket_data)
+        
+        if(len(registrations)):
 
-        tickets_collection.insert_many(registrations)
-        for t in registrations:
-            if "_id" in t:
-                t["_id"] = str(t["_id"])  # or just delete: del t["_id"]
+            tickets_collection.insert_many(registrations)
+            for t in registrations:
+                if "_id" in t:
+                    t["_id"] = str(t["_id"])  # or just delete: del t["_id"]
 
        
 
@@ -456,27 +463,28 @@ def admin_login():
     email = data.get("email", "").strip()
     password = data.get("password", "").strip()
 
-    user = users_collection.find_one(
-        {"email": email, "password": password, "role": "admin"}
-    )
+    user = users_collection.find_one({"email": email, "password": password})
 
-    if user:
+    if user and user.get("role") in ["admin", "superadmin"]:
         token = secrets.token_hex(32)
-        admin_sessions[token] = {"created_at": datetime.now(), "active": True}
+        admin_sessions[token] = {
+            "created_at": datetime.now(),
+            "active": True,
+            "role": user["role"]
+        }
 
         logins_collection.insert_one(
             {
-                "user_type": "admin",
+                "user_type": user["role"],
                 "email": email,
                 "session_token": token,
                 "login_time": datetime.now(),
             }
         )
 
-        return jsonify({"success": True, "token": token})
+        return jsonify({"success": True, "token": token, "role": user["role"]})
     else:
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
-
 
 # @app.route("/admin/logins")
 # def admin_logins():
@@ -485,6 +493,12 @@ def admin_login():
 
 @app.route("/admin/stats")
 def admin_stats():
+    token = request.headers.get("Authorization", "").replace("Bearer ", "")
+    session = admin_sessions.get(token)
+
+    if not session or session["role"] != "superadmin":
+        return jsonify({"error": "Forbidden: Only Superadmin can access stats"}), 403
+
     total_tickets = tickets_collection.count_documents({})
     participants_checked_in = tickets_collection.count_documents({"is_scanned": True})
     pending_entries = total_tickets - participants_checked_in
@@ -501,8 +515,8 @@ def admin_stats():
         "total_revenue": round(total_revenue, 2),
     }
 
-    print(stats)
     return jsonify(stats)
+
 
 @app.route("/admin/scanner")
 def admin_scanner():
