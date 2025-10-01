@@ -494,6 +494,7 @@ def admin_login():
 @app.route("/admin/stats")
 def admin_stats():
     token = request.headers.get("Authorization", "").replace("Bearer ", "")
+
     session = admin_sessions.get(token)
 
     if not session or session["role"] != "superadmin":

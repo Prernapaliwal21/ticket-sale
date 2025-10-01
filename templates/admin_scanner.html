@@ -230,27 +230,41 @@
           document.getElementById("scannerSection").classList.remove("hidden");
 
           if (role === "superadmin") {
-            refreshStats(); 
+            refreshStats();
           } else {
             document
               .querySelectorAll(".grid")
-              .forEach((el) => (el.style.display = "none")); 
+              .forEach((el) => (el.style.display = "none"));
           }
         }
       }
 
       async function refreshStats() {
-        const response = await fetch("/admin/stats");
-        const stats = await response.json();
+        if (!adminToken) return;
 
-        document.getElementById("totalTickets").textContent =
-          stats.total_registrations;
-        document.getElementById("scannedTickets").textContent =
-          stats.participants_checked_in;
-        document.getElementById("pendingTickets").textContent =
-          stats.pending_entries;
-        document.getElementById("totalRevenue").textContent =
-          "Rs." + stats.total_revenue;
+        try {
+          const response = await fetch("/admin/stats", {
+            headers: {
+              Authorization: `Bearer ${adminToken}`, 
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+          const stats = await response.json();
+
+          document.getElementById("totalTickets").textContent =
+            stats.total_registrations;
+          document.getElementById("scannedTickets").textContent =
+            stats.participants_checked_in;
+          document.getElementById("pendingTickets").textContent =
+            stats.pending_entries;
+          document.getElementById("totalRevenue").textContent =
+            "Rs." + stats.total_revenue;
+        } catch (err) {
+          console.error("Failed to fetch stats:", err);
+        }
       }
 
       function startScanner() {
