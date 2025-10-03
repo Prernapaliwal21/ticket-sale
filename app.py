@@ -508,7 +508,7 @@ def admin_stats():
 
     total_revenue = sum(
         float(registration.get("price_per_ticket", 0))
-        for registration in tickets_collection.find({{"phone": {"$ne": "N/A"}}})
+        for registration in tickets_collection.find({"phone": {"$ne": "N/A"}})
     )
 
     stats = {
