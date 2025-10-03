@@ -500,8 +500,10 @@ def admin_stats():
     if not session or session["role"] != "superadmin":
         return jsonify({"error": "Forbidden: Only Superadmin can access stats"}), 403
 
-    total_tickets = tickets_collection.count_documents({})
-    participants_checked_in = tickets_collection.count_documents({"is_scanned": True})
+    total_tickets = tickets_collection.count_documents({"phone": {"$ne": "N/A"}})
+    participants_checked_in = tickets_collection.count_documents(
+        {"phone": {"$ne": "N/A"}, "is_scanned": True}
+    )
     pending_entries = total_tickets - participants_checked_in
 
     total_revenue = sum(
